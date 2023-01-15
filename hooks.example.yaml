@@ -1,0 +1,33 @@
+---
+global:
+  ### log directory for the webhook server's log
+  ### default is "logs" under current directory
+  ### uncomment the following line to customize
+  # log_dir: "logs" 
+
+  ### prefix for the webhook server's log file
+  ### log_prefix: "hook" will create a log file named "hook.log"
+  ### default is "webhook"
+  ### uncomment the following line to customize
+  # log_prefix: "webhook"
+
+  ### log level for the webhook server's log
+  ### valid level should be one of ["Off", "Trace", "Debug", "Info", "Warn", "Error"]
+  ### default is "Info"
+  ### uncomment the following line to customize
+  # log_level: "Info"
+
+hooks:
+- id: "alert"
+  log_dir: "./log_dir/"
+  log_prefix: "test-log"
+  execute_command: "/home/cxy/rust-webhook.sh"
+  response_headers:
+  - name: Access-Control-Allow-Origin
+    value: '*'
+  pass_arguments_to_command: 
+  - source: payload
+    name: user.id
+  - source: string
+    name: "args"
+  

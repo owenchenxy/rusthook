@@ -1,0 +1,19 @@
+---
+global:
+  #log_dir: "./log_dir/"
+  #log_prefix: "test-log"
+
+hooks:
+- id: "webhook-test-1"
+  execute_command: "src/command/test.sh"
+  response_headers:
+    - name: "test_header_1"
+      value: "*"
+  #log_dir: "./log_dir/"
+  log_prefix: "test-log"
+
+- id: "webhook-test-2"
+  execute_command: "test_2.sh"
+  response_headers:
+    - name: "test_header_2"
+      value: "**"
