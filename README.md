@@ -1,5 +1,7 @@
 # What is rusthook ?
 
+<img src="https://github.com/owenchenxy/rusthook/blob/main/docs/logo.png" alt="Rusthook" align="left" />
+
 rusthook is a lightweight configurable webhook tool written in rust. It allows you to run a http server with specified endpoints(hooks), so that you can execute configured commands by sending http request to them. You can also configure the command to be exeuted with arguments, which can be parsed from the http request(e.g. headers, payload, query variables), or directly specified by a string.
 
 For example, if you're using a monitoring tool like Grafana, you can configure an alert rule to use webhook notifier, which will trigger a HTTP request(GET/POST) to a specified url, so that required actions would be performed upon the alert.
