@@ -3,7 +3,7 @@ use std::{
 };
 
 use threadpool;
-use webserver::{config::configs::Configs, mylog::set_global_logger};
+use rusthook::{config::configs::Configs, mylog::set_global_logger};
 
 use clap::Parser;
 
@@ -50,7 +50,7 @@ fn main() {
         let stream = stream.unwrap();
         let cfg = configs.clone();
         pool.execute(||{
-            let _ = webserver::handle_connection(stream, cfg);
+            let _ = rusthook::handle_connection(stream, cfg);
         });
     }
     
