@@ -1,4 +1,11 @@
-use std::{collections::HashMap, io::{BufReader, BufRead, Read}, net::TcpStream};
+use std::{collections::HashMap, io::{BufReader, BufRead, Read}, net::{TcpStream, SocketAddr, ToSocketAddrs}};
+
+use serde_json::Value;
+
+
+pub fn parse_peer_address(reader: &mut BufReader<&mut TcpStream>) -> String{
+    reader.get_ref().peer_addr().unwrap().to_string()
+}
 
 pub fn parse_http_header(reader: &mut BufReader<&mut TcpStream>) -> HashMap<String, String>{
     let http_header: Vec<_> = reader
@@ -19,7 +26,6 @@ pub fn parse_http_header(reader: &mut BufReader<&mut TcpStream>) -> HashMap<Stri
         let value = request[1..].join(": ").to_string();
         header_map.entry(key).or_insert(value);
     }
-    log::info!("{:#?}", header_map );
     header_map
 }
 
@@ -36,8 +42,8 @@ pub fn parse_http_body(reader: &mut BufReader<&mut TcpStream>, content_length: u
     Some(http_body)
 }
 
-pub fn merge_http_request(header: &HashMap<String, String>, body: &Option<String>) -> HashMap<String, String>{
-    match body {
+pub fn merge_http_request(header: &HashMap<String, String>, body: &Option<String>, peer_addr: &SocketAddr) -> HashMap<String, String>{
+    let mut request = match body {
         None => header.clone(),
         Some(s) => {
             let mut request:HashMap<String, String> = HashMap::new();
@@ -45,7 +51,9 @@ pub fn merge_http_request(header: &HashMap<String, String>, body: &Option<String
             request.entry("Body".to_string()).or_insert(s.to_string());
             request 
         }
-    }
+    };
+    request.entry("Peer-Address".to_string()).or_insert(peer_addr.to_string());
+    request
 }
 
 pub fn parse_hook_id_from_url(url: &str) -> String{
@@ -67,7 +75,55 @@ pub fn parse_parameters_from_url(url: &str) -> HashMap<String, String>{
     params_map
 }
 
+pub fn get_item_from_json(v: &Value, item: &str) -> Option<String>{
+    match &v[item] {
+        Value::Null => {
+            let mut indexes = item.split(".").into_iter();
+            let mut val = &v.clone();
+            loop{
+                let next_index = indexes.next();
+                if let Some(i) = next_index {
+                    if let Ok(n) = i.parse::<usize>(){
+                        val = &val[n];
+                    }else{
+                        val = &val[i];
+                    }
+                } else {
+                    break Some(val.as_str().unwrap().to_string())
+                }
+            }  
+        }
+        Value::String(_) => Some(v[item].as_str().unwrap().to_string()),
+        _ => {
+            let err_msg = format!("Invalid parameter {} from payload", item);
+            log::warn!("{}", err_msg);
+            None
+        },
+    }
+}
 
+#[test]
+pub fn test_json_parse(){
+    let v: Value = serde_json::from_str("{\"data\":{\"data2\":\"val\"}}").unwrap();
+    let item = "data.data2";
+    let mut indexes = item.split(".").into_iter();
+    println!("{}", indexes.next().unwrap());
+}
+
+#[test]
+pub fn test_get_item_from_json(){
+    let v: Value = serde_json::from_str("{\"data\":{\"data2\":\"val\"}}").unwrap();
+    let d = get_item_from_json(&v, "data.data2");
+    println!("{}", d.unwrap());
+
+    let v: Value = serde_json::from_str("{\"data\":{\"data2\":[\"val1\", \"val2\"]}}").unwrap();
+    let d = get_item_from_json(&v, "data.data2.1");
+    println!("{}", d.unwrap());
+
+    let v: Value = serde_json::from_str("{\"data\":{\"data2\":[\"val1\", \"val2\"]}, \"data_s\":\"s_d\"}").unwrap();
+    let d = get_item_from_json(&v, "data_s");
+    println!("{}", d.unwrap());
+}
 #[test]
 fn test_get_hook_id_from_http_request_url(){
     let id = parse_hook_id_from_url("/hook/?y=1&u=2");

@@ -11,7 +11,16 @@ hooks:
       value: "*"
   #log_dir: "./log_dir/"
   log_prefix: "test-log"
-
+  pass_arguments_to_command: 
+  - source: payload
+    name: user.id
+  - source: payload
+    name: user.password
+  - source: header
+    name: Host
+  - source: request
+    name: Method
+    
 - id: "webhook-test-2"
   execute_command: "test_2.sh"
   response_headers:

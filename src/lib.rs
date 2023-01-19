@@ -1,5 +1,5 @@
 use std::{
-    io::{prelude::*, BufReader, self}, net::TcpStream
+    io::{prelude::*, BufReader, self}, net::TcpStream, collections::HashMap
 };
 pub mod config;
 pub mod arguments;
@@ -13,7 +13,7 @@ use check::*;
 use command::*;
 use parser::parse_http_header;
 use response::http_response_with_err;
-use arguments::*;
+use serde_json::{json, Value};
 
 use crate::parser::{parse_http_body, merge_http_request};
 
@@ -21,16 +21,18 @@ pub fn handle_connection(mut stream: TcpStream, configs: Configs) -> Result<(), 
     let mut reader = BufReader::new(&mut stream);
     // Get the http request header from tcpstream
     let http_header = parse_http_header(reader.by_ref());
-
+    
     let mut body: Option<String> = None;
     // Get the http request body from the TcpStream for POST request
     if http_header.get("Method").unwrap() == "POST"{
         let content_length: usize = http_header.get("Content-Length").unwrap().parse().unwrap();
         body = parse_http_body(reader.by_ref(), content_length);
     }
+    // Get the peer address from whom the request was sent
+    let peer_addr = reader.by_ref().get_ref().peer_addr().unwrap();
 
     // build a completed http request map
-    let http_request = merge_http_request(&http_header, &body);
+    let http_request = merge_http_request(&http_header, &body, &peer_addr);
 
     // check if the id in request defined in configs 
     if let Err(e) = is_webhook_id_in_configs(&configs, &http_request) {

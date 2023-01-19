@@ -1,14 +1,14 @@
 use std::{process::{Command, Child, Stdio, ExitStatus}, str, fs::File, collections::HashMap, env, io};
 
-use crate::{config::{configs::Configs, Config}, response::{http_response_with_child, http_response_with_err}};
+use crate::{config::{configs::Configs, Config}, response::{http_response_with_child, http_response_with_err}, arguments::Argument};
 
-pub fn execute_script(script: &str, stdout_log: &str) -> io::Result<Child>{
+pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -> io::Result<Child>{
     let stdout_file = File::create(stdout_log).unwrap();
     let stderr_file = File::create(format!("{}.wf", stdout_log)).unwrap();
     let stdout = Stdio::from(stdout_file);
     let stderr = Stdio::from(stderr_file);
 
-    Command::new(script)
+    Command::new(script).args(arguments)
         .stdin(Stdio::piped())
         .stdout(stdout)
         .stderr(stderr)
@@ -34,8 +34,16 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
 pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> String{
     // find the right config from config file for the incoming request
     let script = format!("{}/{}", config.command_working_directory, config.execute_command); 
+    let arguments: Vec<String> = config.pass_arguments_to_command
+    .iter()
+    .map(|arg| Argument::new(arg)
+                                        .unwrap()
+                                        .parse_from_request(http_request)
+                                        .unwrap())
+    .collect();
+
     let stdout_log = config.get_log_path();
-    let response = match execute_script(&script, &stdout_log){
+    let response = match execute_script(&script, &stdout_log, &arguments){
         Ok(c) => http_response_with_child(&c, http_request, config),
         Err(e) => http_response_with_err(&e, http_request, Some(config)),
     };
@@ -44,7 +52,8 @@ pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> 
 
 #[test]
 fn test_execute_script(){
-    let _ = execute_script("src/command/test.shs", "src/command/log/test.log");
+    let args = vec!["-a".to_string(), "-l".to_string()];
+    let _ = execute_script("ls", "logs/test.log", &args);
     //process.try_wait();
 }
 
