@@ -34,7 +34,6 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
 pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> String{
     // find the right config from config file for the incoming request
     let script = format!("{}/{}", config.command_working_directory, config.execute_command); 
-    println!("execute [{}], {:#?}", script, config);
     let stdout_log = config.get_log_path();
     let response = match execute_script(&script, &stdout_log){
         Ok(c) => http_response_with_child(&c, http_request, config),

@@ -6,10 +6,9 @@ use self::global::GlobalConfig;
 pub mod configs;
 pub mod global;
 
-trait Default {
-    fn new() -> Self;
+pub type RespondHeader = HashMap<String, String>;
+pub type CommandArgument = HashMap<String, String>;
 
-}
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub struct Config {
     #[serde(default = "Config::default_id")]
@@ -25,10 +24,10 @@ pub struct Config {
     pub response_message: String,
 
     #[serde(default = "Config::default_response_headers")]
-    pub response_headers: Vec<HashMap<String, String>>,
+    pub response_headers: Vec<RespondHeader>,
 
     #[serde(default = "Config::default_pass_arguments_to_command")]
-    pub pass_arguments_to_command: Vec<HashMap<String, String>>,
+    pub pass_arguments_to_command: Vec<CommandArgument>,
 
     #[serde(default = "Config::default_log_dir")]
     pub log_dir: String,

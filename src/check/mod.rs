@@ -4,10 +4,11 @@ use std::{collections::HashMap, path::Path, fs::{self, File}, io::{Error, ErrorK
 use log::{LevelFilter, Log, Level, MetadataBuilder, Metadata, logger};
 use simplelog::SharedLogger;
 
-use crate::{Configs, config::Config, command::is_valid_command};
+use crate::{Configs, config::Config, command::is_valid_command, parser::parse_hook_id_from_url};
 
 pub fn is_webhook_id_in_configs(configs: &Configs, http_request: &HashMap<String, String>) -> Result<(), io::Error>{
-    let requested_id = http_request.get("Id").unwrap().trim_start_matches("/").to_string();
+    let url = http_request.get("Url").unwrap();
+    let requested_id = parse_hook_id_from_url(url);
     let required_ids:Vec<String> = configs.get_webhook_ids()
     .iter()
     .map(|id|id.trim_start_matches("/").to_string())

@@ -1,6 +1,8 @@
 use serde::{Serialize, Deserialize};
 use std::{fs, collections::HashMap, default};
 
+use crate::parser::parse_hook_id_from_url;
+
 use super::{Config, global::GlobalConfig};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
@@ -27,8 +29,10 @@ impl Configs {
     pub fn get_config_by_http_request(&self, http_request: &HashMap<String, String>) -> Config{
         let mut config: Config = Config::new();
         let mut is_default = true;
+        let url = http_request.get("Url").unwrap();
+        let requested_id = parse_hook_id_from_url(url);
         for item in self.hooks.iter(){
-            if item.id == http_request.get("Id").unwrap().trim_start_matches("/").to_string(){
+            if item.id == requested_id{
                 config = item.clone();
                 is_default = false;
             }
