@@ -19,7 +19,7 @@ jobs:
     - name: work dir
       run: pwd
     - name: ls dir
-      run: ls -l
+      run: ls -l src/config/hooks.test.yaml
     # - uses: actions/checkout@v3
     # - name: Build
     #   run: cargo build --verbose
