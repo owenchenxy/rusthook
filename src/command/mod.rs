@@ -25,7 +25,7 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
     }else{
         command_full_path = command.to_string();
     }
-    println!("{:#?}", command_full_path);
+
     let status = Command::new("command")
     .arg("-v").arg(&command_full_path)
     .stdin(Stdio::null())
@@ -33,6 +33,7 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
     .stderr(Stdio::null())
     .status()
     .expect(format!("failed to execute process: {}", command_full_path).as_str());
+    
     Ok(status.success())
 }
 
@@ -88,6 +89,5 @@ fn test_is_valid_command(){
 fn test_is_valid_command_test_sh(){
     let work_dir = format!("{}/src/command/", env!("CARGO_MANIFEST_DIR"));
     let res = is_valid_command("./test.sh", &work_dir);
-    println!("{:#?}", res);
     assert!(res.unwrap())
 }
