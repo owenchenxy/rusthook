@@ -61,9 +61,11 @@ fn test_execute_script(){
 fn test_trigger_hook(){
     let configs: Configs = Configs::new("src/config/hooks.test.yaml");
     let mut http_request: HashMap<String, String> = HashMap::new();
+    http_request.insert("Method".to_string(), "GET".to_string());
+    http_request.insert("Url".to_string(), "/webhook-test-1/".to_string());
+    http_request.insert("Host".to_string(), "127.0.0.1:7878".to_string());
+    http_request.insert("Version".to_string(), "HTTP/1.1".to_string());
     let config = configs.get_config_by_http_request(&http_request);
-
-    http_request.insert("Id".to_string(), "webhook-test-1".to_string());
     trigger_hook(&config, &http_request);
     ()
 }

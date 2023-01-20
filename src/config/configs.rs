@@ -13,8 +13,12 @@ pub struct Configs{
 
 impl Configs {
     pub fn new(config_file: &str) -> Configs{
-        let configs_str = fs::read_to_string(config_file)
-                                    .expect(format!("Cannot found file: {}", config_file).as_str());
+        let configs_str = match fs::read_to_string(config_file){
+            Ok(s) => s,
+            Err(e) => {
+                panic!("Cannot read file: {}, {}", config_file, e.to_string());
+            }
+        };
         serde_yaml::from_str(configs_str.as_str()).expect(format!("Cannot parse configs from config file: [{}]", config_file).as_str())
     }
 
