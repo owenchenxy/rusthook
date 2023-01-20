@@ -32,7 +32,8 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
 }
 
 pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> String{
-    // find the right config from config file for the incoming request
+    let cwd = env::current_dir();
+    println!("{:#?}", cwd);    // find the right config from config file for the incoming request
     let script = format!("{}/{}", config.command_working_directory, config.execute_command); 
     let arguments: Vec<String> = config.pass_arguments_to_command
     .iter()
