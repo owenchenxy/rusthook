@@ -23,6 +23,6 @@ jobs:
     - name: Build
       run: cargo build --verbose
     - name: show dir
-      run: command -v ls
+      run: command -v /home/runner/work/rusthook/rusthook/src/command/test.sh
     - name: Run tests
       run: cargo test --verbose
