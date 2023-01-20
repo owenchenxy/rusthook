@@ -19,12 +19,12 @@ pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -
 pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
     let command_full_path = format!("{}/{}", work_dir, command);
     let status = Command::new("command")
-    .arg("-v").arg(command_full_path)
+    .arg("-v").arg(&command_full_path)
     .stdin(Stdio::null())
     .stdout(Stdio::null())
     .stderr(Stdio::null())
     .status()
-    .expect("failed to execute process");
+    .expect(format!("failed to execute process: {}", command_full_path).as_str());
     Ok(status.success())
 }
 
