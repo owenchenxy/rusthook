@@ -28,16 +28,7 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
         command_full_path = command.to_string();
     }
 
-    match run_cmd!(echo hello){
-        Ok(r) => println!("{:#?}", r),
-        Err(e) => println!("{:#?}", e)
-    }
-    match run_cmd!(command -v  hh){
-        Ok(r) => println!("{:#?}", r),
-        Err(e) => println!("{:#?}", e)
-    }
-
-    let status = Command::new("ls")
+    let status = Command::new("echo")
     .arg("/home/")//.arg(command_full_path.as_str())
     .stdin(Stdio::null())
     .stdout(Stdio::null())
