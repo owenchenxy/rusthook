@@ -1,6 +1,5 @@
-use std::{process::{Command, Child, Stdio, ExitStatus}, str, fs::File, collections::HashMap, env, io};
-
-use crate::{config::{configs::Configs, Config}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::create_log_file};
+use std::{process::{Command, Child, Stdio, ExitStatus}, str, fs::File, collections::HashMap, env, io, path::{Path, PathBuf}};
+use crate::{config::{configs::Configs, Config}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::create_log_file, command};
 
 pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -> io::Result<Child>{
     
@@ -17,14 +16,24 @@ pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -
 }
 
 pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
-    let command_full_path = format!("{}/{}", work_dir, command);
-    let status = Command::new("command")
-    .arg("-v").arg(command_full_path)
+    let command_full_path: String;
+    if command.starts_with("./"){
+        let command = command.trim_start_matches("./");
+        let dir = work_dir.trim_end_matches('/');
+        command_full_path = format!("{}/{}", dir, command);
+    }else{
+        command_full_path = command.to_string();
+    }
+
+    let status = Command::new("sh")
+    .arg("-c")
+    .arg(format!("command -v {}", command_full_path))//.arg(command_full_path.as_str())
     .stdin(Stdio::null())
     .stdout(Stdio::null())
     .stderr(Stdio::null())
     .status()
-    .expect("failed to execute process");
+    .expect(format!("failed to execute process: {}", command_full_path).as_str());
+    
     Ok(status.success())
 }
 
@@ -72,14 +81,18 @@ fn test_trigger_hook(){
 
 #[test]
 #[should_panic]
-fn test_is_valid_command(){
+fn test_isnot_valid_command(){
     assert!(is_valid_command("ks", "/").unwrap())
+}
+
+#[test]
+fn test_is_valid_command(){
+    assert!(is_valid_command("ls", "/").unwrap())
 }
 
 #[test]
 fn test_is_valid_command_test_sh(){
     let work_dir = format!("{}/src/command/", env!("CARGO_MANIFEST_DIR"));
     let res = is_valid_command("./test.sh", &work_dir);
-    println!("{:#?}", res);
     assert!(res.unwrap())
 }
