@@ -31,11 +31,10 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
     .stdin(Stdio::null())
     .stdout(Stdio::null())
     .stderr(Stdio::null())
-    .output()
+    .status()
     .expect(format!("failed to execute process: {}", command_full_path).as_str());
     
-    println!("{:#?}", status);
-    Ok(status.status.success())
+    Ok(status.success())
 }
 
 pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> String{
