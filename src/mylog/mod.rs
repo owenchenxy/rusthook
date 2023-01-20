@@ -43,14 +43,3 @@ pub fn set_hook_logger(path: &str, level: &LevelFilter) -> Box<WriteLogger<File>
     };
     WriteLogger::new(*level, simplelog::Config::default(), file)
 }
-
-#[test]
-fn test_log(){
-    let logger = set_hook_logger("myhook.log", &LevelFilter::Info);
-    let record = log::Record::builder()
-                 .level(Level::Info)
-                 .args(format_args!("err1"))
-                 .build();
-    logger.log(&record);
-}
-

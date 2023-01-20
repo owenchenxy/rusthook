@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use std::{fs, collections::HashMap, default};
+use std::{fs, collections::HashMap};
 
 use crate::parser::parse_hook_id_from_url;
 
@@ -57,7 +57,12 @@ fn test_parse_config_from_yaml(){
 #[test]
 fn test_get_webhook_ids(){
     let configs = Configs::new("src/config/hooks.test.yaml");
-    println!("{:#?}", configs.get_webhook_ids())
+    let exp = vec![
+        "webhook-test-1".to_string(),
+        "webhook-test-2".to_string()
+    ];
+    let res = configs.get_webhook_ids();
+    assert_eq!(res, exp);
 }
 
 #[test]

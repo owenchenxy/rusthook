@@ -111,28 +111,40 @@ pub fn test_json_parse(){
 }
 
 #[test]
-pub fn test_get_item_from_json(){
+pub fn test_get_item_in_map(){
     let v: Value = serde_json::from_str("{\"data\":{\"data2\":\"val\"}}").unwrap();
-    let d = get_item_from_json(&v, "data.data2");
-    println!("{}", d.unwrap());
-
-    let v: Value = serde_json::from_str("{\"data\":{\"data2\":[\"val1\", \"val2\"]}}").unwrap();
-    let d = get_item_from_json(&v, "data.data2.1");
-    println!("{}", d.unwrap());
-
-    let v: Value = serde_json::from_str("{\"data\":{\"data2\":[\"val1\", \"val2\"]}, \"data_s\":\"s_d\"}").unwrap();
-    let d = get_item_from_json(&v, "data_s");
-    println!("{}", d.unwrap());
+    let d = get_item_from_json(&v, "data.data2").unwrap();
+    assert_eq!(String::from("val"), d);
 }
+
+#[test]
+pub fn test_get_item_in_list(){
+    let v: Value = serde_json::from_str("{\"data\":{\"data2\":[\"val1\", \"val2\"]}}").unwrap();
+    let d = get_item_from_json(&v, "data.data2.1").unwrap();
+    assert_eq!(String::from("val2"), d);
+}
+
+#[test]  
+pub fn test_get_item_direct(){
+    let v: Value = serde_json::from_str("{\"data\":{\"data2\":[\"val1\", \"val2\"]}, \"data_s\":\"s_d\"}").unwrap();
+    let d = get_item_from_json(&v, "data_s").unwrap();
+    assert_eq!(String::from("s_d"), d);
+}
+
 #[test]
 fn test_get_hook_id_from_http_request_url(){
     let id = parse_hook_id_from_url("/hook/?y=1&u=2");
-    println!("{}", id);
+    assert_eq!(String::from("hook"), id);
 }
 
 #[test]
 fn test_parse_parameters_from_url(){
     let url = "/hooks/?x=1&y=2&z=aaa";
     let res = parse_parameters_from_url(url);
-    println!("{:#?}", res);
+    let exp = HashMap::from([
+        ("x".to_string(), "1".to_string()),
+        ("y".to_string(), "2".to_string()),
+        ("z".to_string(), "aaa".to_string()),
+    ]);
+    assert_eq!(res, exp);
 }

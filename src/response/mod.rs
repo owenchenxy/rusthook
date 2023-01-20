@@ -1,4 +1,4 @@
-use std::{io, process::Child, collections::HashMap, fmt::format};
+use std::{io, process::Child, collections::HashMap};
 
 use serde_json::json;
 

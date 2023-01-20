@@ -70,26 +70,31 @@ pub fn preflight_check(config: &Config) -> Result<(), io::Error>{
 
 
 #[test]
-#[should_panic]
 fn test_isnot_webhook_id_in_configs(){
     let configs = Configs::new("src/config/hooks.test.yaml");
     let mut http_request: HashMap<String, String> = HashMap::new();
-    http_request.insert("Id".to_string(), "webhook-test-3".to_string());
-    let _ = is_webhook_id_in_configs(&configs, &http_request);
+    http_request.insert("Url".to_string(), "/webhook-test-3/".to_string());
+    let r = is_webhook_id_in_configs(&configs, &http_request);
+    assert!(r.is_err());
 }
 
 #[test]
 fn test_is_webhook_id_in_configs(){
     let configs = Configs::new("src/config/hooks.test.yaml");
     let mut http_request: HashMap<String, String> = HashMap::new();
-    http_request.insert("Id".to_string(), "webhook-test-1".to_string());
-    let _ = is_webhook_id_in_configs(&configs, &http_request);
+    http_request.insert("Url".to_string(), "/webhook-test-1/?a=1&b=2".to_string());
+    let r = is_webhook_id_in_configs(&configs, &http_request);
+    assert!(r.is_ok())
 }
 
 #[test]
 fn test_check_log_config(){
     let mut config = Config::new();
     config.log_dir = String::from("./log_dir/testhook/");
-    let _ = check_log_config(&config);
+    let r = check_log_config(&config);
+    if r.is_ok(){
+        let _ = fs::remove_dir_all(String::from("./log_dir/"));
+    }
+    assert!(r.is_ok());
 }
 

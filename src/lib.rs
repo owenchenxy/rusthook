@@ -1,5 +1,5 @@
 use std::{
-    io::{prelude::*, BufReader, self}, net::TcpStream, collections::HashMap
+    io::{prelude::*, BufReader}, net::TcpStream
 };
 pub mod config;
 pub mod arguments;
@@ -8,12 +8,11 @@ pub mod command;
 pub mod parser;
 pub mod response;
 pub mod mylog;
-use config::{configs::Configs, Config};
+use config::{configs::Configs};
 use check::*;
 use command::*;
 use parser::parse_http_header;
 use response::http_response_with_err;
-use serde_json::{json, Value};
 
 use crate::parser::{parse_http_body, merge_http_request};
 
