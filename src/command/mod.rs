@@ -1,7 +1,4 @@
 use std::{process::{Command, Child, Stdio, ExitStatus}, str, fs::File, collections::HashMap, env, io, path::{Path, PathBuf}};
-
-use cmd_lib::{use_builtin_cmd, run_cmd};
-
 use crate::{config::{configs::Configs, Config}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::create_log_file, command};
 
 pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -> io::Result<Child>{
