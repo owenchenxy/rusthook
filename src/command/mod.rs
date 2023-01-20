@@ -81,8 +81,13 @@ fn test_trigger_hook(){
 
 #[test]
 #[should_panic]
-fn test_is_valid_command(){
+fn test_isnot_valid_command(){
     assert!(is_valid_command("ks", "/").unwrap())
+}
+
+#[test]
+fn test_is_valid_command(){
+    assert!(is_valid_command("ls", "/").unwrap())
 }
 
 #[test]
