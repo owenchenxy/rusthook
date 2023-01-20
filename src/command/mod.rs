@@ -53,7 +53,7 @@ pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> 
 #[test]
 fn test_execute_script(){
     let args = vec!["-a".to_string(), "-l".to_string()];
-    let _ = execute_script("ls", "logs/test.log", &args);
+    let _ = execute_script("ls", "test.log", &args);
     //process.try_wait();
 }
 
