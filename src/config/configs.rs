@@ -54,13 +54,15 @@ impl Configs {
 
 #[test]
 fn test_parse_config_from_yaml(){
-    let configs = Configs::new("src/config/hooks.test.yaml");
+    let config_file = format!("{}/src/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
+    let configs = Configs::new(&config_file);
     println!("{:#?}", configs);
 }
 
 #[test]
 fn test_get_webhook_ids(){
-    let configs = Configs::new("src/config/hooks.test.yaml");
+    let config_file = format!("{}/src/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
+    let configs = Configs::new(&config_file);
     let exp = vec![
         "webhook-test-1".to_string(),
         "webhook-test-2".to_string()
@@ -71,8 +73,9 @@ fn test_get_webhook_ids(){
 
 #[test]
 fn test_get_config_by_http_request(){
-    let configs = Configs::new("src/config/hooks.test.yaml");
+    let config_file = format!("{}/src/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
+    let configs = Configs::new(&config_file);
     let mut http_request: HashMap<String, String> = HashMap::new();
-    http_request.insert("Id".to_string(), "webhook-test-2".to_string());
+    http_request.insert("Url".to_string(), "/webhook-test-2/".to_string());
     println!("{:#?}", configs.get_config_by_http_request(&http_request));
 }

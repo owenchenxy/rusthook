@@ -1,0 +1,23 @@
+total 10
+drwxr-xr-x  20 root  wheel   640 Jan 22  2022 .
+drwxr-xr-x  20 root  wheel   640 Jan 22  2022 ..
+lrwxr-xr-x   1 root  admin    36 Jan 22  2022 .VolumeIcon.icns -> System/Volumes/Data/.VolumeIcon.icns
+----------   1 root  admin     0 Jan 22  2022 .file
+drwxr-xr-x   2 root  wheel    64 Jan 22  2022 .vol
+lrwxr-xr-x   1 root  wheel    33 Jan 20 10:21 AppleInternal -> System/Volumes/Data/AppleInternal
+drwxrwxr-x  36 root  admin  1152 Jan 20 10:43 Applications
+drwxr-xr-x  72 root  wheel  2304 Sep 22 17:09 Library
+drwxr-xr-x@  9 root  wheel   288 Jan 22  2022 System
+drwxr-xr-x   5 root  admin   160 May 23  2022 Users
+drwxr-xr-x   3 root  wheel    96 Jan 20 10:21 Volumes
+drwxr-xr-x@ 38 root  wheel  1216 Jan 22  2022 bin
+drwxrwxr-t   2 root  admin    64 Jan 22  2022 cores
+dr-xr-xr-x   4 root  wheel  4756 Jan 20 10:12 dev
+lrwxr-xr-x@  1 root  wheel    11 Jan 22  2022 etc -> private/etc
+lrwxr-xr-x   1 root  wheel    25 Jan 20 10:21 home -> /System/Volumes/Data/home
+drwxr-xr-x   3 root  wheel    96 May 23  2022 opt
+drwxr-xr-x   6 root  wheel   192 Jan 22  2022 private
+drwxr-xr-x@ 65 root  wheel  2080 Jan 22  2022 sbin
+lrwxr-xr-x@  1 root  wheel    11 Jan 22  2022 tmp -> private/tmp
+drwxr-xr-x@ 11 root  wheel   352 Jan 22  2022 usr
+lrwxr-xr-x@  1 root  wheel    11 Jan 22  2022 var -> private/var

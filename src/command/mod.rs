@@ -1,10 +1,11 @@
 use std::{process::{Command, Child, Stdio, ExitStatus}, str, fs::File, collections::HashMap, env, io};
 
-use crate::{config::{configs::Configs, Config}, response::{http_response_with_child, http_response_with_err}, arguments::Argument};
+use crate::{config::{configs::Configs, Config}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::create_log_file};
 
 pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -> io::Result<Child>{
-    let stdout_file = File::create(stdout_log).unwrap();
-    let stderr_file = File::create(format!("{}.wf", stdout_log)).unwrap();
+    
+    let stdout_file = create_log_file(stdout_log).unwrap();
+    let stderr_file = create_log_file(format!("{}.wf", stdout_log).as_str()).unwrap();
     let stdout = Stdio::from(stdout_file);
     let stderr = Stdio::from(stderr_file);
 
@@ -16,24 +17,19 @@ pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -
 }
 
 pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
-    let cwd = env::current_dir()?;
-    let _ = env::set_current_dir(work_dir);   
-     
+    let command_full_path = format!("{}/{}", work_dir, command);
     let status = Command::new("command")
-    .arg("-v").arg(command)
+    .arg("-v").arg(command_full_path)
     .stdin(Stdio::null())
     .stdout(Stdio::null())
     .stderr(Stdio::null())
     .status()
     .expect("failed to execute process");
-
-    let _ = env::set_current_dir(cwd); 
     Ok(status.success())
 }
 
 pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> String{
-    let cwd = env::current_dir();
-    println!("{:#?}", cwd);    // find the right config from config file for the incoming request
+    // find the right config from config file for the incoming request
     let script = format!("{}/{}", config.command_working_directory, config.execute_command); 
     let arguments: Vec<String> = config.pass_arguments_to_command
     .iter()
@@ -54,19 +50,22 @@ pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> 
 #[test]
 fn test_execute_script(){
     let args = vec!["-a".to_string(), "-l".to_string()];
-    let _ = execute_script("ls", "test.log", &args);
+    let log = format!("{}/logs/test.log", env!("CARGO_MANIFEST_DIR"));
+    let _ = execute_script("ls", &log, &args);
     //process.try_wait();
 }
 
 #[test]
 fn test_trigger_hook(){
-    let configs: Configs = Configs::new("src/config/hooks.test.yaml");
+    let config_file = format!("{}/src/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
+    let configs: Configs = Configs::new(&config_file);
     let mut http_request: HashMap<String, String> = HashMap::new();
     http_request.insert("Method".to_string(), "GET".to_string());
     http_request.insert("Url".to_string(), "/webhook-test-1/".to_string());
     http_request.insert("Host".to_string(), "127.0.0.1:7878".to_string());
     http_request.insert("Version".to_string(), "HTTP/1.1".to_string());
-    let config = configs.get_config_by_http_request(&http_request);
+    let mut config = configs.get_config_by_http_request(&http_request);
+    config.log_dir = format!("{}/logs", env!("CARGO_MANIFEST_DIR"));
     trigger_hook(&config, &http_request);
     ()
 }
@@ -79,5 +78,8 @@ fn test_is_valid_command(){
 
 #[test]
 fn test_is_valid_command_test_sh(){
-    assert!(is_valid_command("./test.sh", "src/command/").unwrap())
+    let work_dir = format!("{}/src/command/", env!("CARGO_MANIFEST_DIR"));
+    let res = is_valid_command("./test.sh", &work_dir);
+    println!("{:#?}", res);
+    assert!(res.unwrap())
 }

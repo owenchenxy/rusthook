@@ -7,7 +7,9 @@ use simplelog::WriteLogger;
 pub fn create_log_file(path: &str) -> Result<File, io::Error>{
     let path = std::path::Path::new(path);
     let prefix = path.parent().unwrap();
-    std::fs::create_dir_all(prefix).unwrap();
+    if let Err(e) = std::fs::create_dir_all(prefix){
+        println!("{:#?} {:#?} {:#?}", prefix, path, e);
+    }
 
     match std::fs::OpenOptions::new()
                 .append(true)

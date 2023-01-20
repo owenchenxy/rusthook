@@ -1,5 +1,5 @@
 #!/bin/bash
-sleep 2
+sleep 10
 
 # generate an stdout
 echo -n "hello bash"
