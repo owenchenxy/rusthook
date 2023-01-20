@@ -79,16 +79,16 @@ fn test_trigger_hook(){
     ()
 }
 
-// #[test]
-// #[should_panic]
-// fn test_isnot_valid_command(){
-//     assert!(is_valid_command("ks", "/").unwrap())
-// }
+#[test]
+#[should_panic]
+fn test_isnot_valid_command(){
+    assert!(is_valid_command("ks", "/").unwrap())
+}
 
-// #[test]
-// fn test_is_valid_command(){
-//     assert!(is_valid_command("ls", "/").unwrap())
-// }
+#[test]
+fn test_is_valid_command(){
+    assert!(is_valid_command("ls", "/").unwrap())
+}
 
 #[test]
 fn test_is_valid_command_test_sh(){
