@@ -1,5 +1,7 @@
 use std::{process::{Command, Child, Stdio, ExitStatus}, str, fs::File, collections::HashMap, env, io, path::{Path, PathBuf}};
 
+use cmd_lib::{use_builtin_cmd, run_cmd};
+
 use crate::{config::{configs::Configs, Config}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::create_log_file, command};
 
 pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -> io::Result<Child>{
@@ -26,7 +28,16 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
         command_full_path = command.to_string();
     }
 
-    let status = Command::new("cd")
+    match run_cmd!(echo hello){
+        Ok(r) => println!("{:#?}", r),
+        Err(e) => println!("{:#?}", e)
+    }
+    match run_cmd!(command -v  hh){
+        Ok(r) => println!("{:#?}", r),
+        Err(e) => println!("{:#?}", e)
+    }
+
+    let status = Command::new("ls")
     .arg("/home/")//.arg(command_full_path.as_str())
     .stdin(Stdio::null())
     .stdout(Stdio::null())
