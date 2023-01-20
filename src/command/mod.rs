@@ -27,7 +27,7 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
     }
 
     let status = Command::new("command")
-    .arg("-v").arg(&command_full_path)
+    .arg("-v").arg(command_full_path.as_str())
     .stdin(Stdio::null())
     .stdout(Stdio::null())
     .stderr(Stdio::null())
