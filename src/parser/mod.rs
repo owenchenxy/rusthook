@@ -15,10 +15,11 @@ pub fn parse_http_header(reader: &mut BufReader<&mut TcpStream>) -> HashMap<Stri
         .collect();
 
     let request_0: Vec<&str> = http_header[0].split(' ').collect();
-    let mut header_map: HashMap<String, String> = HashMap::new();
-    header_map.entry("Method".to_string()).or_insert(request_0[0].to_string());
-    header_map.entry("Url".to_string()).or_insert(request_0[1].to_string());
-    header_map.entry("Version".to_string()).or_insert(request_0[2].to_string());
+    let mut header_map: HashMap<String, String> = HashMap::from([
+        ("Method".to_string(), request_0[0].to_string()),
+        ("Url".to_string(), request_0[1].to_string()),
+        ("Version".to_string(), request_0[2].to_string()),
+    ]);
 
     for item in http_header[1..].iter(){
         let request: Vec<&str>= item.split(": ").collect();

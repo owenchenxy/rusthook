@@ -95,6 +95,7 @@ impl Argument {
 
     pub fn parse_from_request(&self, request: &HashMap<String, String>) -> Result<String, io::Error>{
         match self.source.as_str() {
+            "string" => Ok(self.name.clone()),
             "payload" => self.get_argument_from_payload(request, &self.name),
             "query" => self.get_argument_from_query(request, &self.name),
             "header" => self.get_argument_from_header(request, &self.name),
@@ -163,6 +164,14 @@ pub fn test_parse_arg(){
     let map = HashMap::from([
         ("source".to_string(), "header".to_string()),
         ("name".to_string(), "Host".to_string()),
+    ]);
+    let arg = Argument::new(&map).unwrap();
+    let res = arg.parse_from_request(&request).unwrap();
+    println!("{}, {}", res, res.len());
+
+    let map = HashMap::from([
+        ("source".to_string(), "string".to_string()),
+        ("name".to_string(), "str_param".to_string()),
     ]);
     let arg = Argument::new(&map).unwrap();
     let res = arg.parse_from_request(&request).unwrap();
