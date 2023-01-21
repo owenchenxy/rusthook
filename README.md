@@ -85,4 +85,7 @@ It will start up on any ip of your server with default port 7878 and will provid
 1. http://yourserver:7878/cpu_high_alert
 2. http://yourserver:7878/mem_high_alert
 ```
+
+Check [rusthook parameters page](docs/Rusthook-Parameters.md) to see how to override the ip, port and other performance settings such as maximum thread number, tread stack size, etc.
+
 By performing a simple HTTP GET or POST request to those endpoint, your specified repair script would be executed. Neat!
