@@ -1,6 +1,6 @@
-use log::{Level, LevelFilter};
+use log::{LevelFilter};
 use serde::{Serialize, Deserialize};
-use std::{fs, collections::HashMap, path::PathBuf};
+use std::{collections::HashMap};
 
 use self::global::GlobalConfig;
 pub mod configs;

@@ -1,5 +1,5 @@
-use std::{process::{Command, Child, Stdio, ExitStatus}, str, fs::File, collections::HashMap, env, io, path::{Path, PathBuf}};
-use crate::{config::{configs::Configs, Config}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::create_log_file, command};
+use std::{process::{Command, Child, Stdio}, str, collections::HashMap, io};
+use crate::{config::{Config, configs::Configs}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::create_log_file};
 
 pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -> io::Result<Child>{
     

@@ -1,7 +1,7 @@
 use core::result::Result;
 use std::{io::{ErrorKind, self}, fs::File};
 
-use log::{LevelFilter, Level, Log};
+use log::{LevelFilter};
 use simplelog::WriteLogger;
 
 pub fn create_log_file(path: &str) -> Result<File, io::Error>{
