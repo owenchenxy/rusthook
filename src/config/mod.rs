@@ -104,7 +104,7 @@ impl Config {
     }
     
     pub fn default_response_message() -> String{
-        String::from("success")
+        String::new()
     }
     
     pub fn default_response_headers() -> Vec<HashMap<String, String>>{

@@ -9,6 +9,7 @@ pub fn is_webhook_id_in_configs(configs: &Configs, http_request: &HashMap<String
     .map(|id|id.trim_start_matches("/").to_string())
     .collect();
 
+
     if !required_ids.contains(&requested_id) {
         let err_msg = format!("request ignored with undefined hook id: {}", requested_id);
         log::warn!("{}", err_msg);

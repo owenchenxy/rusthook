@@ -64,7 +64,13 @@ impl Argument {
 
     pub fn get_argument_from_payload(&self, request: &HashMap<String, String>, name: &String) -> Result<String, io::Error>{
         if request.get("Method").unwrap() == "GET" {
-            return Ok("".to_string());
+            let err_msg = format!("Could not parse argument [{}] from GET request with no payload", name);
+            log::error!("{}", err_msg);
+
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                err_msg,
+            ))
         }
         let payload = request.get("Body").unwrap();
         let v: Value = serde_json::from_str(payload).unwrap();

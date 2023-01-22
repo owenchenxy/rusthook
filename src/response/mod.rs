@@ -1,6 +1,4 @@
 use std::{io, process::Child, collections::HashMap};
-
-use serde::de::value;
 use serde_json::json;
 
 use crate::config::Config;
@@ -31,7 +29,6 @@ pub fn http_response_with_child(child: &Child, http_request: &HashMap<String, St
     {headers}\r\n\
     \r\n\
     {contents}");
-    println!("{response}");
     response
 }
 
@@ -48,7 +45,7 @@ pub fn http_response_with_err(err: &io::Error, http_request: &HashMap<String, St
     let err_msg = err.to_string();
     let contents = match config{
         None => &err_msg,
-        Some(c) => &c.response_message,
+        Some(_) => &status_line,
     };
 
     let length = contents.len();

@@ -1,6 +1,17 @@
 use std::{collections::HashMap, io::{BufReader, BufRead, Read}, net::{TcpStream, SocketAddr}};
 use serde_json::Value;
 
+pub fn parse_command(dir: &str, command: &str) -> String{
+    let command_full_path: String;
+    if command.starts_with("./"){
+        let command = command.trim_start_matches("./");
+        let dir = dir.trim_end_matches('/');
+        command_full_path = format!("{}/{}", dir, command);
+    }else{
+        command_full_path = command.to_string();
+    }
+    command_full_path
+}
 
 pub fn parse_peer_address(reader: &mut BufReader<&mut TcpStream>) -> String{
     reader.get_ref().peer_addr().unwrap().to_string()
@@ -146,4 +157,19 @@ fn test_parse_parameters_from_url(){
         ("z".to_string(), "aaa".to_string()),
     ]);
     assert_eq!(res, exp);
+}
+
+#[test]
+fn test_parse_command(){
+    let command = "ls";
+    let dir = "./";
+    assert_eq!("ls", parse_command(dir, command));
+
+    let command = "./test.sh";
+    let dir = "./";
+    assert_eq!("./test.sh", parse_command(dir, command));
+
+    let command = "/home/test.sh";
+    let dir = "./exe";
+    assert_eq!("/home/test.sh", parse_command(dir, command));
 }
