@@ -1,9 +1,4 @@
-use core::panic;
-use std::{collections::HashMap, path::Path, fs::{self, File}, io::{Error, ErrorKind, self}, fmt::format };
-
-use log::{LevelFilter, Log, Level, MetadataBuilder, Metadata, logger};
-use simplelog::SharedLogger;
-
+use std::{collections::HashMap, fs, io};
 use crate::{Configs, config::Config, command::is_valid_command, parser::parse_hook_id_from_url};
 
 pub fn is_webhook_id_in_configs(configs: &Configs, http_request: &HashMap<String, String>) -> Result<(), io::Error>{

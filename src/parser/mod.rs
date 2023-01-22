@@ -1,5 +1,4 @@
 use std::{collections::HashMap, io::{BufReader, BufRead, Read}, net::{TcpStream, SocketAddr}};
-
 use serde_json::Value;
 
 
@@ -105,7 +104,6 @@ pub fn get_item_from_json(v: &Value, item: &str) -> Option<String>{
 
 #[test]
 pub fn test_json_parse(){
-    let v: Value = serde_json::from_str("{\"data\":{\"data2\":\"val\"}}").unwrap();
     let item = "data.data2";
     let mut indexes = item.split(".").into_iter();
     println!("{}", indexes.next().unwrap());
