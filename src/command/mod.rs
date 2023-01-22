@@ -1,12 +1,26 @@
-use std::{process::{Command, Child, Stdio}, str, collections::HashMap, io};
-use crate::{config::{Config, configs::Configs}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::create_log_file, parser::parse_command};
+use std::{process::{Command, Child, Stdio}, str, collections::HashMap, io::{self, Write}};
+use log::{Record, Log};
 
-pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -> io::Result<Child>{
+use crate::{config::{Config, configs::Configs}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::{create_log_file, set_hook_logger}};
+
+pub fn execute_script(cmd: &str, cwd: &str, stdout_log: &str, arguments: &Vec<String>) -> io::Result<Child>{
     let stdout_file = create_log_file(stdout_log).unwrap();
     let stderr_file = create_log_file(format!("{}.wf", stdout_log).as_str()).unwrap();
     let stdout = Stdio::from(stdout_file);
     let stderr = Stdio::from(stderr_file);
-    Command::new(script).args(arguments)
+    
+    let stderr_log = format!("{}.wf", stdout_log);
+    let hook_stdout_logger = set_hook_logger(stdout_log, &log::LevelFilter::Info);
+    let hook_stderr_logger = set_hook_logger(stderr_log.as_str(), &log::LevelFilter::Info);
+
+    let meta_args = format_args!("");
+    let meta_record = Record::builder().args(meta_args).build();
+    hook_stdout_logger.log(&meta_record);
+    hook_stderr_logger.log(&meta_record);
+
+    Command::new(cmd)
+        .args(arguments)
+        .current_dir(cwd)
         .stdin(Stdio::piped())
         .stdout(stdout)
         .stderr(stderr)
@@ -14,22 +28,21 @@ pub fn execute_script(script: &str, stdout_log: &str, arguments: &Vec<String>) -
 }
 
 pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
-    let command_full_path = parse_command(work_dir, command);
     let status = Command::new("sh")
     .arg("-c")
-    .arg(format!("command -v {}", command_full_path))//.arg(command_full_path.as_str())
+    .arg(format!("command -v {}", command))
+    .current_dir(work_dir)//.arg(command_full_path.as_str())
     .stdin(Stdio::null())
     .stdout(Stdio::null())
     .stderr(Stdio::null())
     .status()
-    .expect(format!("failed to execute process: {}", command_full_path).as_str());
+    .expect(format!("failed to execute process: {} under directory {}", command, work_dir).as_str());
     
     Ok(status.success())
 }
 
 pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> String{
     // find the right config from config file for the incoming request
-    let script = parse_command(&config.command_working_directory, &config.execute_command); 
     let arguments: Vec<String> = config.pass_arguments_to_command
     .iter()
     .map(|arg| match Argument::new(arg)
@@ -47,9 +60,9 @@ pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> 
     .collect();
 
     let stdout_log = config.get_log_path();
-    let response = match execute_script(&script, &stdout_log, &arguments){
+    let response = match execute_script(&config.execute_command, &config.command_working_directory, &stdout_log, &arguments){
         Ok(c) => {
-            let msg = format!("Command [{}] issued in process id: {}", script, c.id());
+            let msg = format!("Command [{}] issued under dir {} in process id: {}", &config.execute_command, &config.command_working_directory, c.id());
             log::info!("{}", msg);
             http_response_with_child(&c, http_request, config)
         },
@@ -66,8 +79,7 @@ pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> 
 fn test_execute_script(){
     let args = vec!["-a".to_string(), "-l".to_string()];
     let log = format!("{}/logs/test.log", env!("CARGO_MANIFEST_DIR"));
-    let _ = execute_script("ls", &log, &args);
-    //process.try_wait();
+    let _ = execute_script("ls", "/", &log, &args);
 }
 
 #[test]

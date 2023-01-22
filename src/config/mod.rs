@@ -1,6 +1,6 @@
 use log::{LevelFilter};
 use serde::{Serialize, Deserialize};
-use std::{collections::HashMap};
+use std::{collections::HashMap, env};
 
 use self::global::GlobalConfig;
 pub mod configs;
@@ -100,7 +100,7 @@ impl Config {
     }
 
     pub fn default_command_working_directory() -> String{
-        String::from(".")
+        env::current_dir().unwrap().to_string_lossy().to_string()
     }
     
     pub fn default_response_message() -> String{

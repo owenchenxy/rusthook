@@ -32,7 +32,8 @@ pub fn set_global_logger(path: &str, level: LevelFilter){
             panic!()
         }
     };
-    let _ = WriteLogger::init(level, simplelog::Config::default(), file);
+    let log_config = simplelog::ConfigBuilder::new().set_time_format_rfc3339().build();
+    let _ = WriteLogger::init(level, log_config, file);
 }
 
 pub fn set_hook_logger(path: &str, level: &LevelFilter) -> Box<WriteLogger<File>>{
@@ -43,5 +44,6 @@ pub fn set_hook_logger(path: &str, level: &LevelFilter) -> Box<WriteLogger<File>
             panic!()
         }
     };
-    WriteLogger::new(*level, simplelog::Config::default(), file)
+    let log_config = simplelog::ConfigBuilder::new().set_time_format_rfc3339().build();
+    WriteLogger::new(*level, log_config, file)
 }
