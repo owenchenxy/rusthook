@@ -19,9 +19,9 @@ impl SingleRule {
             "value" => self.match_value(http_request),
             "regex" => self.match_regex(http_request),
             "hmac-sha1" => self.match_hmac_sha1(http_request),
-            "hmac-sha256" => self.match_hmac_sha1(http_request),
-            "hmac_sha512" => self.match_hmac_sha512(http_request),
-            "ip_whitelist" => self.match_ip_whitelist(http_request),
+            "hmac-sha256" => self.match_hmac_sha256(http_request),
+            "hmac-sha512" => self.match_hmac_sha512(http_request),
+            "ip-whitelist" => self.match_ip_whitelist(http_request),
             &_ => false,
         }
     }
@@ -68,6 +68,10 @@ impl SingleRule {
     }
 
     fn match_ip_whitelist(&self, http_request: &HashMap<String, String>) -> bool {
+        todo!()
+    }
+
+    fn match_hmac_sha256(&self, http_request: &HashMap<String, String>) -> bool {
         todo!()
     }
 }
