@@ -88,4 +88,6 @@ It will start up on any ip of your server with default port 7878 and will provid
 
 Check [rusthook parameters page](docs/Rusthook-Parameters.md) to see how to override the ip, port and other performance settings such as maximum thread number, tread stack size, etc.
 
-By performing a simple HTTP GET or POST request to those endpoint, your specified repair script would be executed. Neat!
+By performing a simple HTTP GET or POST request to those endpoint, your specified repair script would be executed!
+
+Furthermore, you can define a combination of rules to determine whether the hook would be triggered. This is absolutely for demand of security. Without the rules, anyone who knows your endpoint can send a request to your server and thus execute the command. To define the rules, you can use the `trigger_rules` property for a specific hook. Please refer to doc [Hook Trigger Rules page](docs/Hook-Trigger-Rules.md) to see the detailed list of available rules and their usage.

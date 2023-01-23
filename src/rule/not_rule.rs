@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
 use serde_yaml::Value;
 
-use super::{Rule, single_rule::SingleRule};
+use super::{Rule};
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub struct NotRule{

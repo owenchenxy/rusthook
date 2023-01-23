@@ -2,7 +2,6 @@ use std::collections::HashMap;
 
 use serde::{Serialize, Deserialize};
 use serde_yaml::Value;
-use serde_yaml::Value::Sequence;
 use super::Rule;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]

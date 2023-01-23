@@ -71,6 +71,4 @@ fn test_parse_config_with_rule(){
     let rule = configs.hooks[0].trigger_rules.as_ref().unwrap();
     let rule = Rule::new(rule);
     println!("{:#?}", rule);
-    // //rule.as_mapping().unwrap().len();
-    // println!("{}", rule["type"].as_str().unwrap());
 }
