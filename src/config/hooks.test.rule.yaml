@@ -1,0 +1,29 @@
+---
+global:
+  #log_dir: "./log_dir/"
+  #log_prefix: "test-log"
+
+hooks:
+- id: "webhook-test-1"
+  execute_command: "src/command/test.sh"
+  response_headers:
+    - name: "test_header_1"
+      value: "*"
+  #log_dir: "./log_dir/"
+  log_prefix: "test-log"
+  pass_arguments_to_command: 
+  - source: payload
+    name: user.id
+  - source: payload
+    name: user.password
+  - source: header
+    name: Host
+  - source: request
+    name: Method
+  trigger_rules:
+    and:
+      - kind: value
+        value: 127.0.0.1:7878
+        source: header
+        name: Host
+  

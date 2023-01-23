@@ -49,11 +49,7 @@ pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> 
                                         .unwrap()
                                         .parse_from_request(http_request){
                                             Ok(r) => r,
-                                            Err(e) => {
-                                                let msg = format!("{}, will be ignored", e.to_string());
-                                                log::warn!("{}", msg);
-                                                String::new()
-                                            }
+                                            Err(_) => String::new()   
                                         }
     )
     .filter(| arg | !arg.is_empty())

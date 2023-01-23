@@ -101,6 +101,20 @@ pub fn get_item_from_json(v: &Value, item: &str) -> Option<String>{
     }
 }
 
+pub fn get_payload_item_from_http_request(item: &str, http_request: &HashMap<String, String>) -> Option<String>{
+    match http_request.get("Body"){
+        Some(payload) =>  {
+            let v: Value = serde_json::from_str(payload).unwrap();
+            get_item_from_json(&v, item)
+        },
+        None => None
+    }
+}
+
+pub fn get_header_from_http_request(name: &str, http_request: &HashMap<String, String>) -> Option<String>{
+    http_request.get(name).cloned()
+}
+
 #[test]
 pub fn test_json_parse(){
     let item = "data.data2";

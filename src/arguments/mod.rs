@@ -65,7 +65,7 @@ impl Argument {
     pub fn get_argument_from_payload(&self, request: &HashMap<String, String>, name: &String) -> Result<String, io::Error>{
         if request.get("Method").unwrap() == "GET" {
             let err_msg = format!("Could not parse argument [{}] from GET request with no payload", name);
-            log::error!("{}", err_msg);
+            log::warn!("{}", err_msg);
 
             return Err(io::Error::new(
                 io::ErrorKind::InvalidInput,

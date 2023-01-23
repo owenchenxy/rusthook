@@ -13,3 +13,4 @@ serde_json = "1.0.91"
 clap = { version = "^4.0.32", features = ["derive"] }
 log = "^0.4.17"
 simplelog= "^0.12"
+regex = "^1.7.1"

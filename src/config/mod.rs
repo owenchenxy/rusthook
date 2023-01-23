@@ -2,12 +2,15 @@ use log::{LevelFilter};
 use serde::{Serialize, Deserialize};
 use std::{collections::HashMap, env};
 
+use crate::rule::Rule;
+
 use self::global::GlobalConfig;
 pub mod configs;
 pub mod global;
 
-pub type RespondHeader = HashMap<String, String>;
-pub type CommandArgument = HashMap<String, String>;
+type RespondHeader = HashMap<String, String>;
+type CommandArgument = HashMap<String, String>;
+type TriggerRules = serde_yaml::Value;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub struct Config {
@@ -37,6 +40,9 @@ pub struct Config {
 
     #[serde(default = "Config::default_log_level")]
     pub log_level: String,
+
+    #[serde(default = "Config::default_trigger_rules")]
+    pub trigger_rules: Option<TriggerRules>
 }
 
 
@@ -52,6 +58,7 @@ impl Config {
             log_dir: String::from("."),
             log_prefix: None,
             log_level: String::from("Info"),
+            trigger_rules: None,
         }
     }
     
@@ -113,6 +120,17 @@ impl Config {
 
     pub fn default_pass_arguments_to_command() -> Vec<HashMap<String, String>>{
         Vec::new()
+    }
+
+    pub fn default_trigger_rules() -> Option<TriggerRules>{
+        None
+    }
+
+    pub fn get_trigger_rule(&self) -> Option<Rule>{
+        match &self.trigger_rules{
+            None => None,
+            Some(v) => Some(Rule::new(v))
+        }
     }
 }
 

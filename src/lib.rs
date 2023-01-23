@@ -8,6 +8,7 @@ pub mod command;
 pub mod parser;
 pub mod response;
 pub mod mylog;
+mod rule;
 use config::{configs::Configs};
 use check::*;
 use command::*;
@@ -44,7 +45,7 @@ pub fn handle_connection(mut stream: TcpStream, configs: Configs) -> Result<(), 
     let config = &configs.get_config_by_http_request(&http_request);
 
     // preflight check according to the found config
-    if let Err(e) = preflight_check(&config){
+    if let Err(e) = preflight_check(&config, &http_request){
         let response = http_response_with_err(&e, &http_request, None);
         stream.write_all(response.as_bytes()).unwrap();
         return Ok(());

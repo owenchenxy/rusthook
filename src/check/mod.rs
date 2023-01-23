@@ -58,9 +58,28 @@ pub fn check_log_config(config: &Config) -> io::Result<()>{
     }
 }
 
-pub fn preflight_check(config: &Config) -> Result<(), io::Error>{
-    check_execute_command(&config)?;
-    check_log_config(&config)?;
+pub fn check_trigger_rules(config: &Config, http_request: &HashMap<String, String>) -> io::Result<()>{
+    // check trigger rules
+    if let Some(r) = config.get_trigger_rule(){
+        if !r.is_matched(&http_request){
+            let err_msg = format!("Failed to Trigger Hook [{}]: Rule Mismatch!", config.id);
+            log::error!("{}", err_msg);
+
+            let error = io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Tigger Rules Mismatch",
+            );
+            return Err(error)
+        }
+    }
+    log::info!("Trigger rules matched, hook [{}] triggered", config.id);
+    Ok(())
+}
+
+pub fn preflight_check(config: &Config, http_request: &HashMap<String, String>) -> Result<(), io::Error>{
+    check_execute_command(config)?;
+    check_log_config(config)?;
+    check_trigger_rules(config, http_request)?;
     Ok(())
 }
 
