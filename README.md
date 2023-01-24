@@ -12,7 +12,8 @@ webhook should only focus on limited functions which is listed below:
 + parse the request(headers, body, query variables),
 + check if the requested hook id matches any of the configuration item,
 + parse arguments from the request according to the configuration,
-+ execute the specified command with arguments,
++ check the trigger rules to determine whether to trigger hook,
++ execute the specified command with arguments if rules match,
 + send response to the request initiator
   
 Everything else is the responsibility of the command's author.
