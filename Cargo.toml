@@ -14,3 +14,5 @@ clap = { version = "^4.0.32", features = ["derive"] }
 log = "^0.4.17"
 simplelog= "^0.12"
 regex = "^1.7.1"
+rust-crypto = "^0.2.36"
+itertools = "0.10.5"
