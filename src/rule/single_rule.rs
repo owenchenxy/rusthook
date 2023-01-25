@@ -218,15 +218,6 @@ fn test_match_hmac_sha1(){
 }
 
 #[test]
-fn gen_mac(){
-    let payload = "";
-    let secret = "1";
-    let mut hasher = Hmac::new(Sha1::new(), secret.as_bytes());
-    hasher.input(payload.as_bytes());
-    println!("{:#?}", hasher.result().code());
-}
-
-#[test]
 fn test_extract_signature(){
     let source = "sha1=8888";
     let prefix = "sha1=";

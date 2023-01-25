@@ -2,9 +2,9 @@
 
 <img src="https://github.com/owenchenxy/rusthook/blob/main/docs/logo.png" alt="Rusthook" align="left" />
 
-rusthook is a lightweight configurable webhook tool written in rust. It allows you to run a http server with specified endpoints(hooks), so that you can execute configured commands by sending http request to them. You can also configure the command to be exeuted with arguments, which can be parsed from the http request(e.g. headers, payload, query variables), or directly specified by a string.
+rusthook is a lightweight configurable webhook tool written in rust. It allows you to run an http server with specified endpoints(hooks), so that you can execute configured commands by sending http request to them. You can also configure the command to be exeuted with arguments, which can be parsed from the http request(e.g. headers, payload, query variables), or directly specified by a string.
 
-For example, if you're using a monitoring tool like Grafana, you can configure an alert rule to use webhook notifier, which will trigger a HTTP request(GET/POST) to a specified url, so that required actions would be performed upon the alert.
+For example, if you're using a monitoring tool like Grafana, you can configure an alert rule to use webhook notifier, which will trigger an HTTP request(GET/POST) to a specified url, so that required actions would be performed upon the alert.
 
 webhook should only focus on limited functions which is listed below:
 
@@ -44,7 +44,7 @@ In current release, all global configs are log related and they all have default
 global:
 ```
 
-Now, let's configure the real useful hooks. Imagine there is a cpu monitor in my system, it will send a http request to a webhook upon high CPU utilization detected. When the hook server receives the request, it knows that there's something wrong with the CPU utilization and should perform some actions to repair it. 
+Now, let's configure the real useful hooks. Imagine there is a cpu monitor in my system, it will send an http request to a webhook upon high CPU utilization detected. When the hook server receives the request, it knows that there's something wrong with the CPU utilization and should perform some actions to repair it. 
 
 For this senario, let's define a simple hook named `cpu_high_alert`(endpoint to receive alert request) that will run a script located in `/var/scripts/repair_cpu_high.sh`(to repair something according to the alert). Make sure that your bash script has `#!/bin/sh` shebang on top and is executable.
 

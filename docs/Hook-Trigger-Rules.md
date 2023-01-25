@@ -25,9 +25,41 @@ Every single rule are defined by 4 keys:
     ```
     the above rule will be evaluated to be true, if the value of header `Host` in http request matches the regular expression `.*:7878`
 
-+ `hmac-sha1`: ToBeDone
-+ `hmac-sha256`: ToBeDone
-+ `hmac-sha512`: ToBeDone
++ `hmac-sha1`: payload will be encrypted by the give secret using SHA1 hash and compare with the specified source signature. The field `value` is for the secret key for encryption.
+    ```
+    kind: hmac-sha1
+    value: "mysecret"
+    source: header
+    name: "X-Signature"
+    ```
+    for the above rule, with payload of below:
+    ```
+    {
+      "payload": "mypayload"
+    }
+    ``` 
+    we can calculate it's sha1 hash with secret "mysecret", it should be `22b5b8548adfdec0322b2114f17648c34a3081e6`. Thus in the request headers, header "X-Signature" should contain a signature with this hash. e.g. 
+    ```
+    X-Hub-Signature: sha1=22b5b8548adfdec0322b2114f17648c34a3081e6
+    ```
+    Note that if there are multiple signatures, they should be seperated by comma and will be tried one by one until a match is found. For example:
+    ```
+    X-Hub-Signature: sha1=232328349ffdaccc78999897,sha1=22b5b8548adfdec0322b2114f17648c34a3081e6
+    ```
++ `hmac-sha256`: similar to `hmac-sha256`, payload will be encrypted by the give secret using SHA256 hash and compare with the specified source signature. The field `value` is for the secret key for encryption.
+    ```
+    kind: hmac-sha256
+    value: "mysecret"
+    source: header
+    name: "X-Signature"
+    ```
++ `hmac-sha512`: similar to `hmac-sha512`, payload will be encrypted by the give secret using SHA512 hash and compare with the specified source signature. The field `value` is for the secret key for encryption.
+    ```
+    kind: hmac-sha512
+    value: "mysecret"
+    source: header
+    name: "X-Signature"
+    ```
 + `ip-whitelist`: ToBeDone
     
 ## Combined Rule

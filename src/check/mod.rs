@@ -67,7 +67,7 @@ pub fn check_trigger_rules(config: &Config, http_request: &HashMap<String, Strin
 
             let error = io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "Tigger Rules Mismatch",
+                "Trigger Rules Mismatch",
             );
             return Err(error)
         }
