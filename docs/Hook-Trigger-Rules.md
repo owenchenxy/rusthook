@@ -60,7 +60,11 @@ Every single rule are defined by 4 keys:
     source: header
     name: "X-Signature"
     ```
-+ `ip-whitelist`: ToBeDone
++ `ip-whitelist`: only allow requests sent from the addresses matching the ip whitelist. The IP can be IPv4/6 formatted. Use /32(/128) to match a single IPv4(6) address. field `source` and `name` can be ommited. Multiple ip ranges could be seperated by comma.
+    ```
+    kind: ip-whitelist
+    value: "10.0.0.0/24, 192.168.100.4/30, 172.16.80.3/32"
+    ```
     
 ## Combined Rule
 Combined rule is combined by multiple single rule or combined rule with logical operations(And/Or/Not).

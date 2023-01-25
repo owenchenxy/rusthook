@@ -1,21 +1,35 @@
-use std::{collections::HashMap, io, vec, ptr::eq, str::{from_utf8, from_utf8_unchecked}};
+use std::{collections::HashMap, vec, net::{IpAddr, Ipv4Addr}};
 
+use ipnet::IpNet;
 use itertools::Itertools;
 use serde::{Serialize, Deserialize};
-use crypto::{digest::Digest, sha1::Sha1, hmac::Hmac, mac::Mac, sha2::{Sha256, Sha512}};
+use crypto::{sha1::Sha1, hmac::Hmac, mac::Mac, sha2::{Sha256, Sha512}};
 
 use crate::parser::*;
-use regex::{Regex, bytes};
+use regex::{Regex};
 
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
 pub struct SingleRule {
     pub kind:  String,
     pub value: String,
+
+    #[serde(default = "SingleRule::default_source")]
     pub source: String,
+
+    #[serde(default = "SingleRule::default_name")]
     pub name: String,
 }
+
 impl SingleRule {
+    pub fn default_source() -> String{
+        String::new()
+    }
+
+    pub fn default_name() -> String{
+        String::new()
+    }
+
     pub fn is_matched(&self, http_request: &HashMap<String, String>) -> bool {
         match self.kind.as_str(){
             "value" => self.match_value(http_request),
@@ -100,10 +114,42 @@ impl SingleRule {
             },
             Some(s) => s,
         };
-        check_payload_signature512(payload, secret, signature.as_str())    }
+        check_payload_signature512(payload, secret, signature.as_str())    
+    }
 
     fn match_ip_whitelist(&self, http_request: &HashMap<String, String>) -> bool {
-        todo!()
+        let peer_address = http_request.get("Peer-Address").unwrap();
+        let ip = match peer_address.split(":").collect::<Vec<&str>>()[0].parse::<IpAddr>(){
+            Ok(r) => r,
+            Err(e) => {
+                let msg = format!("Invalid Peer Address {}: {}", peer_address, e);
+                log::warn!("{}", msg);
+                return false;
+            }
+        };
+
+        let ip_ranges: Vec<String>;
+        if self.value.contains(","){
+            ip_ranges = extract_comma_separated_values(&self.value, "");
+        }else{
+            ip_ranges = vec![(*self.value).to_string()];
+        }
+
+        ip_ranges
+        .iter()
+        .map(|cidr|{
+            match cidr.parse::<IpNet>(){
+                Ok(r) => r,
+                Err(e) => {
+                    let msg = format!("Invalid IP CIDR {}: {}", cidr, e);
+                    log::error!("{}", msg);
+                    IpNet::new(Ipv4Addr::new(0, 0, 0, 0).into(), 32).unwrap()
+                }
+            }
+        })
+        .collect::<Vec<IpNet>>()
+        .iter()
+        .any(|x|x.contains(&ip))        
     }
 }
 
@@ -126,7 +172,7 @@ fn check_payload_signature256(payload: Option<&String>, secret: &str, signature:
         return false;
 	}
 	// Extract the signatures.
-	let signatures = extract_signatures(signature, "sha1=");
+	let signatures = extract_signatures(signature, "sha256=");
 	// Validate the MAC.
 	validate_mac(payload, &mut Hmac::new(Sha256::new(), secret.as_bytes()), signatures)
 }
@@ -138,7 +184,7 @@ fn check_payload_signature512(payload: Option<&String>, secret: &str, signature:
         return false;
 	}
 	// Extract the signatures.
-	let signatures = extract_signatures(signature, "sha1=");
+	let signatures = extract_signatures(signature, "sha512=");
 	// Validate the MAC.
 	validate_mac(payload, &mut Hmac::new(Sha512::new(), secret.as_bytes()), signatures)
 }
@@ -234,6 +280,30 @@ fn test_extract_comma_separated_values(){
 }
 
 #[test]
+fn test_match_ip_white_list(){
+    let request: HashMap<String, String> = HashMap::from([
+        ("Url".to_string(), "/webhook-test-1".to_string()),
+        ("User-Agent".to_string(), "curl/7.77.0".to_string()),
+        ("Version".to_string(), "HTTP/1.1".to_string()),
+        ("Method".to_string(), "POST".to_string()),
+        ("Accept".to_string(), "*/*".to_string()),
+        ("Host".to_string(), "127.0.0.1:7878".to_string()),
+        ("Content-Type".to_string(), "application/json".to_string()),
+        ("Content-Length".to_string(), "45".to_string()),
+        ("Body".to_string(), "{\"data\":{\"data2\":[\"val1\", \"val2\"], \"data3\": \"val3\"},\"data_s\":\"s_d\"}".to_string()),
+        ("Peer-Address".to_string(), "127.0.0.1:56020".to_string()),
+    ]);
+
+    let single_rule = SingleRule{
+        kind: "ip-whitelist".to_string(),
+        value: "10.0.1.2/24, 10.0.2.5/24, 10.0.0.1/32".to_string(),
+        source: "".to_string(),
+        name: "".to_string(),
+    };
+    assert!(single_rule.match_ip_whitelist(&request));
+}
+
+#[test]
 fn test_match_value(){
     let request: HashMap<String, String> = HashMap::from([
         ("Url".to_string(), "/webhook-test-1".to_string()),
@@ -295,4 +365,10 @@ fn test_match_regex(){
         name: "Host".to_string(),
     };
     assert!(!single_rule.match_regex(&request));
+}
+
+#[test]
+fn test_extract_comma_separated_cidr(){
+    let s = "1.1.1.1/24,2.2.2.2/24";
+    println!("{:#?}", extract_comma_separated_values(s, ""));
 }
