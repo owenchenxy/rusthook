@@ -31,18 +31,17 @@ pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
     match Command::new("sh")
     .arg("-c")
     .arg(format!("command -v {}", command))
-    .current_dir(work_dir)//.arg(command_full_path.as_str())
+    .current_dir(work_dir)
     .stdin(Stdio::null())
     .stdout(Stdio::null())
     .stderr(Stdio::null())
     .status(){
         Ok(r) => Ok(r.success()),
         Err(e) => {
-            let msg = format!("Invalid command [{}](dir: {}): {}", command, work_dir, e.to_string());
-            log::error!("{}", msg);
+            log::error!("{}", e);
             let error = io::Error::new(
                 io::ErrorKind::InvalidInput,
-                "Invalid command",
+                "Validate Command Failed",
             );
             Err(error)
         }
