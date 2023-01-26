@@ -1,4 +1,5 @@
 FROM rust as builder
+
 COPY . .
 RUN apt-get update \
     && apt-get -y install musl-tools \
@@ -6,6 +7,7 @@ RUN apt-get update \
     && rustup target add x86_64-unknown-linux-musl \
     && cargo install --root /tmp/ --path . --target x86_64-unknown-linux-musl
 
-FROM scratch
+FROM bash
+WORKDIR /
 COPY --from=builder /tmp/bin/rusthook /rusthook
 ENTRYPOINT [ "/rusthook" ]
