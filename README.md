@@ -27,6 +27,17 @@ cargo build --release
 ```
 to build the latest version of rusthook.
 
+### Docker container
+Note that `--privileged=true` is nessesary, because the server need to start multi threads.
+```
+docker run --privileged=true\
+-v <config_file_directory>:/config/<config_file> \
+-p <listen_port>:<listen_port> \
+ghcr.io/owenchenxy/rusthook:latest \
+-c /config/<config_file> \
+...(other optional parameters for rusthook)
+```
+
 # Configuration
 Next step is to define a list of hooks you want rusthook to serve. Currently rusthook only support configuration file of YAML format.Begin by creating an empty file named hooks.yaml. This file will contain a list of endpoints(hooks) to be served.
 
