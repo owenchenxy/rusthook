@@ -28,17 +28,25 @@ pub fn execute_script(cmd: &str, cwd: &str, stdout_log: &str, arguments: &Vec<St
 }
 
 pub fn is_valid_command(command: &str, work_dir: &str) -> std::io::Result<bool>{
-    let status = Command::new("sh")
+    match Command::new("sh")
     .arg("-c")
     .arg(format!("command -v {}", command))
     .current_dir(work_dir)//.arg(command_full_path.as_str())
     .stdin(Stdio::null())
     .stdout(Stdio::null())
     .stderr(Stdio::null())
-    .status()
-    .expect(format!("failed to execute process: {} under directory {}", command, work_dir).as_str());
-    
-    Ok(status.success())
+    .status(){
+        Ok(r) => Ok(r.success()),
+        Err(e) => {
+            let msg = format!("Invalid command [{}](dir: {}): {}", command, work_dir, e.to_string());
+            log::error!("{}", msg);
+            let error = io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Invalid command",
+            );
+            Err(error)
+        }
+    } 
 }
 
 pub fn trigger_hook(config: &Config, http_request: &HashMap<String, String>) -> String{
