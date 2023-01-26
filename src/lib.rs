@@ -1,5 +1,5 @@
 use std::{
-    io::{prelude::*, BufReader}, net::TcpStream
+    io::{prelude::*, BufReader}, net::TcpStream, fs
 };
 pub mod config;
 pub mod arguments;
@@ -12,8 +12,8 @@ mod rule;
 use config::{configs::Configs};
 use check::*;
 use command::*;
-use parser::parse_http_header;
-use response::http_response_with_err;
+use parser::{parse_http_header, parse_hook_id_from_url};
+use response::{http_response_with_err, respond_with_favicon};
 
 use crate::parser::{parse_http_body, merge_http_request};
 
@@ -34,10 +34,13 @@ pub fn handle_connection(mut stream: TcpStream, configs: Configs) -> Result<(), 
     // build a completed http request map
     let http_request = merge_http_request(&http_header, &body, &peer_addr);
 
+    if parse_hook_id_from_url(http_request.get("Url").unwrap()) == "favicon.ico"{
+        respond_with_favicon(&mut stream);
+        return Ok(());
+    }
     // check if the id in request defined in configs 
     if let Err(e) = is_webhook_id_in_configs(&configs, &http_request) {
-        let response = http_response_with_err(&e, &http_request, None);
-        stream.write_all(response.as_bytes()).unwrap();
+        http_response_with_err(&mut stream, &e, &http_request, None);
         return Ok(());
     };
 
@@ -46,13 +49,11 @@ pub fn handle_connection(mut stream: TcpStream, configs: Configs) -> Result<(), 
 
     // preflight check according to the found config
     if let Err(e) = preflight_check(&config, &http_request){
-        let response = http_response_with_err(&e, &http_request, None);
-        stream.write_all(response.as_bytes()).unwrap();
+        http_response_with_err(&mut stream, &e, &http_request, None);
         return Ok(());
     };
 
     // generate response and send
-    let response = trigger_hook(&config, &http_request);
-    stream.write_all(response.as_bytes()).unwrap();
+    trigger_hook(&mut stream, &config, &http_request);
     Ok(())
 }

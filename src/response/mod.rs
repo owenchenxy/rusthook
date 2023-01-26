@@ -1,7 +1,9 @@
-use std::{io, process::Child, collections::HashMap};
+use std::{io::{self, Write}, process::Child, collections::HashMap, net::TcpStream, fs};
 use serde_json::json;
 
 use crate::config::Config;
+use favicon::FAVICON;
+pub mod favicon;
 
 pub fn format_response_headers_to_string(headers: &Vec<HashMap<String, String>>) -> String{
     headers.iter()
@@ -14,7 +16,7 @@ pub fn format_response_headers_to_string(headers: &Vec<HashMap<String, String>>)
     .join("\r\n")
 }
 
-pub fn http_response_with_child(child: &Child, http_request: &HashMap<String, String>, config: &Config) -> String{
+pub fn http_response_with_child(stream: &mut TcpStream, child: &Child, http_request: &HashMap<String, String>, config: &Config) {
     let status_line = format!("{} 200 OK", http_request.get("Version").unwrap());
     let config_str = serde_json::to_string(&config).unwrap();
     let headers = format_response_headers_to_string(&config.response_headers);
@@ -29,10 +31,10 @@ pub fn http_response_with_child(child: &Child, http_request: &HashMap<String, St
     {headers}\r\n\
     \r\n\
     {contents}");
-    response
+    stream.write_all(response.as_bytes()).unwrap()
 }
 
-pub fn http_response_with_err(err: &io::Error, http_request: &HashMap<String, String>, config: Option<&Config>) -> String{
+pub fn http_response_with_err(stream: &mut TcpStream, err: &io::Error, http_request: &HashMap<String, String>, config: Option<&Config>) {
     let status_line: String;
     match err.kind() {
         io::ErrorKind::NotFound => {
@@ -49,10 +51,21 @@ pub fn http_response_with_err(err: &io::Error, http_request: &HashMap<String, St
     };
 
     let length = contents.len();
-    format!("{status_line}\r\n\
+    let response = format!("{status_line}\r\n\
     Content-Length: {length}\r\n\
     \r\n\
-    {contents}")
+    {contents}");
+    stream.write_all(response.as_bytes()).unwrap()
+}
+
+pub fn respond_with_favicon(stream: &mut TcpStream){
+    let response = format!("HTTP/1.1 200 OK\r\n\
+    Content-Length: {}\r\n\
+    Content-Type:image/x-icon\r\n\
+    \r\n", FAVICON.len());  
+    stream.write(response.as_bytes()).unwrap();
+    stream.write_all(FAVICON).unwrap();
+    stream.flush().unwrap();
 }
 
 #[test]
