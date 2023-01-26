@@ -18,16 +18,63 @@ global:
   # log_level: "Info"
 
 hooks:
+  ### specifies the ID of the hook. 
+  ### rusthook server will create an endpoint using this ID. 
+  ### for example, with the id of `myid`, the server will be able to receive request on url `http:://your_server:port/myid`
+  ### Default to be `default`, but better to consider it to be mandatory
 - id: "alert"
-  log_dir: "./log_dir/"
-  log_prefix: "test-log"
-  execute_command: "/home/cxy/rust-webhook.sh"
-  response_headers:
-  - name: Access-Control-Allow-Origin
-    value: '*'
-  pass_arguments_to_command: 
-  - source: payload
-    name: user.id
-  - source: string
-    name: "args"
+
+  ### specifies the command to be executed when the hook of corresponding id is triggered
+  ### this config is mandatory
+  execute_command: "/home/cxy/repair_alert.sh"
+
+  ### specifies the directory where the log of the `execute_command` should be located. 
+  ### It can be ommitted. Default to be the same as that of the global configuration.
+  ### uncomment the following line to customize
+  # log_dir: "logs"
+
+  ### specifies the log file name prefix for the `execute_command`. 
+  ### It can be ommitted. Default to be the same as the hook `id`. 
+  ### e.g. given a hook's `id` is "alert", there will be a log with name of "alert.log" for stdout log, and a log with name of "alert.log.wf" for stderr log.
+  ### uncomment the following line to customize
+  # log_prefix: "my_alert"
+
+  ### specifies the directory, to which should be switched while executing command
+  ### It can be ommitted. Default to be the current directory.
+  ### uncomment the following line to customize
+  # command_working_directory: "."
+  
+  ### specifies the list of headers in the http response
+  ### will not add headers in response if nothing specified
+  ### uncomment the following line to customize
+  # response_headers:
+  # - name: Access-Control-Allow-Origin
+  #   value: '*'
+
+  ### specifies a list of arguments for the command
+  ### will not pass any argument to the command if nothing specified
+  ### uncomment the following line to customize
+  # pass_arguments_to_command: 
+  # - source: payload
+  #   name: user.id
+
+  ### specifies a group of rules to be evaluated to determine whether the hook should be triggered
+  ### will always allow to trigger if nothing specified
+  # trigger_rules:
+  #   and:
+  #   - kind: value
+  #     value: 127.0.0.1:7878
+  #     source: header
+  #     name: Host
+  #   - kind: regex
+  #     value: "superuser: 0[0-9]*"
+  #     source: payload
+  #     name: user.id
+  #   - or:
+  #     - kind: hmac-sha1
+  #       value: mysecret
+  #       source: header
+  #       name: X-Singnature
+  #     - kind: ip-whitelist
+  #       value: "10.10.10.0/24, 172.31.56.10/32, 10.20.10.4/30"
   

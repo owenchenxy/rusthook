@@ -91,7 +91,7 @@ impl Config {
     }
 
     pub fn default_execute_command() -> String{
-        String::from("src/command/test.sh")
+        String::new()
     }
 
     pub fn default_log_dir() -> String{
