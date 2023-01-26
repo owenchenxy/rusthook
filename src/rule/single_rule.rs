@@ -291,7 +291,7 @@ fn test_match_ip_white_list(){
         ("Content-Type".to_string(), "application/json".to_string()),
         ("Content-Length".to_string(), "45".to_string()),
         ("Body".to_string(), "{\"data\":{\"data2\":[\"val1\", \"val2\"], \"data3\": \"val3\"},\"data_s\":\"s_d\"}".to_string()),
-        ("Peer-Address".to_string(), "127.0.0.1:56020".to_string()),
+        ("Peer-Address".to_string(), "10.0.2.6:56020".to_string()),
     ]);
 
     let single_rule = SingleRule{
