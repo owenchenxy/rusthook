@@ -1,8 +1,13 @@
 FROM rust as builder
-COPY . .
-RUN mkdir -p /tmp/ \
-    && cargo install --root /tmp/ --path .
 
-FROM scratch
+COPY . .
+RUN apt-get update \
+    && apt-get -y install musl-tools \
+    && mkdir -p /tmp/ \
+    && rustup target add x86_64-unknown-linux-musl \
+    && cargo install --root /tmp/ --path . --target x86_64-unknown-linux-musl
+
+FROM bash
+WORKDIR /
 COPY --from=builder /tmp/bin/rusthook /rusthook
 ENTRYPOINT [ "/rusthook" ]

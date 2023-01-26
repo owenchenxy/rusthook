@@ -26,15 +26,18 @@ pub fn is_webhook_id_in_configs(configs: &Configs, http_request: &HashMap<String
 pub fn check_execute_command(config: &Config) -> io::Result<()>{
     let execute_command = &config.execute_command;
     let command_working_directory = &config.command_working_directory;
-    if !is_valid_command(execute_command, command_working_directory).unwrap(){
-        let err_msg = format!("invalid command: {} (working directory: {})", &config.execute_command, &config.command_working_directory);
-        log::error!("{}", err_msg);
-
-        let error = io::Error::new(
-            io::ErrorKind::InvalidInput,
-            "Invalid Command",
-        );
-        return Err(error);
+    match is_valid_command(execute_command, command_working_directory){
+        Ok(b) => if !b{
+            let err_msg = format!("invalid command: {} (working directory: {})", &config.execute_command, &config.command_working_directory);
+            log::error!("{}", err_msg);
+    
+            let error = io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "Invalid Command",
+            );
+            return Err(error);
+        },
+        Err(e) => return Err(e)
     }
     Ok(())
 }
