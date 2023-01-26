@@ -36,10 +36,10 @@ pub fn http_response_with_err(err: &io::Error, http_request: &HashMap<String, St
     let status_line: String;
     match err.kind() {
         io::ErrorKind::NotFound => {
-            status_line = format!("{:#?} 404 Not Found", http_request.get("Version").unwrap());
+            status_line = format!("{} 404 Not Found", http_request.get("Version").unwrap());
         },
         _ => {
-            status_line = format!("{:#?} 500 Internal Server Error", http_request.get("Version").unwrap());
+            status_line = format!("{} 500 Internal Server Error", http_request.get("Version").unwrap());
         }
     }
     let err_msg = err.to_string();
