@@ -1,0 +1,46 @@
+trigger: none
+
+parameters:
+  - name: job_displayName
+    default: Deploy binaries
+  - name: job_name
+    default: deploy
+  - name: artifactName
+    default: target
+  
+variables:
+  - template: ./vars.yaml
+
+resources:
+  pipelines:
+  - pipeline: build 
+    source: CI 
+    trigger: true 
+
+jobs:
+  - job: ${{ parameters['job_name'] }}
+    displayName: ${{ parameters['job_displayName'] }}
+    steps:
+      - download: 'build'
+        artifact: ${{ parameters['artifactName'] }}
+        displayName: "download artifact"
+
+      - script: |
+          DATE="$(date +%Y-%m-%d)"
+          echo "##vso[task.setvariable variable=build.date]$DATE"
+          mv $(Pipeline.Workspace)/build/${{parameters['artifactName']}} $(Pipeline.Workspace)/build/${{parameters['artifactName']}}-$DATE
+        displayName: "Rename artifact"
+
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: $(azureSubscription)
+          scriptType: 'bash'
+          scriptLocation: 'inlineScript'
+          addSpnToEnvironment: true 
+          inlineScript: |   
+            az config set extension.use_dynamic_install=yes_without_prompt
+            accountkey=`az storage account keys list -n $(storageaccount_name) --query="[0].value" -o tsv`
+            uploadtokenexpiry=`date -u -d "30 minutes" '+%Y-%m-%dT%H:%MZ'`
+            uploadsas=$(az storage container generate-sas -n $(container_name) --https-only --permissions rwl --expiry $uploadtokenexpiry -o tsv --account-name $(storageaccount_name) --account-key $accountkey)
+            az storage azcopy blob upload -c $(container_name) --account-name $(storageaccount_name) -s $(Pipeline.Workspace)/build/${{parameters['artifactName']}}-$(build.date)  --recursive --sas-token $uploadsas
+

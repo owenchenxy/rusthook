@@ -1,0 +1,59 @@
+parameters:
+  # azure pipelines paramters
+  job_name: cargo_build             # Default job name
+  job_displayName: Cargo build      # Default displayName
+  job_dependsOn: []                 # Dependencies to for the job to start
+  job_condition: true               # Job condition
+  job_post-steps: []                # Custom steps running after job
+  job_pre-steps: []                 # Custom steps before job start
+  job_pool:
+    vmImage: ubuntu-20.04           # Default vmImage
+
+  # global parameters
+  rust: stable                # Version of rust. Could be [stable, beta, nightly, 1.31, nightly-2018-08-01 ... ]
+
+  # parameters from `cargo check --help`
+  release: false              # Check artifacts in release mode, with optimizations
+  target: ''                  # Check for the target triple
+
+jobs:
+- job: ${{ parameters['job_name'] }}
+  displayName: ${{ parameters['job_displayName'] }}
+  condition: ${{ parameters['job_condition'] }}
+  dependsOn: ${{ parameters['job_dependsOn'] }}
+  pool:
+    vmImage: ${{ parameters.job_pool['vmImage'] }}
+  variables:
+    check_flags: ''
+  steps:
+  # Custom pre steps:
+  - ${{ if parameters['job_pre-steps'] }}:
+    - ${{ parameters['job_pre-steps'] }}
+
+  - template: ../steps/install-rust.yml
+    parameters:
+      rustup_toolchain: ${{ parameters['rust'] }}
+      ${{ if ne(parameters['target'], '') }}:
+        targets: 
+        - ${{ parameters['target'] }}
+ 
+  # ##########################################################################################
+  # Order of script modifying `check_flags` is the same as in paramters.
+  - bash: echo '##vso[task.setvariable variable=check_flags]$(check_flags) --release'
+    enabled: ${{ parameters['release'] }}
+    displayName: "[cli flag modify]Set using release mode"
+
+  - bash: echo "##vso[task.setvariable variable=check_flags]$(check_flags) --target ${{ parameters['target'] }}"
+    enabled: ${{ ne(parameters['target'], '')  }}
+    displayName: "[cli flag modify]Check for the target triple"
+    
+  # ##########################################################################################
+
+  # Final run
+  - bash: cargo build $(check_flags)
+    displayName: Run cargo build with defined flags 
+
+  # Custom steps:
+  - ${{ if parameters['job_post-steps'] }}:
+    - ${{ parameters['job_post-steps'] }}
+

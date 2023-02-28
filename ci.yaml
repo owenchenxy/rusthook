@@ -1,0 +1,30 @@
+trigger: none
+# trigger:
+#   branches:
+#     include: ['*']
+#   tags:
+#     include: ['*']
+
+stages: 
+- stage: check
+  displayName: "Quick checks"
+  jobs:
+  - template: scenarios/check.yml
+    parameters: 
+      cargo-check: true
+      cargo-check-nightly: true
+      rustfmt: true
+
+- stage: test
+  displayName: "Multi OS native tests"
+  jobs:
+  - template: scenarios/test.yml
+
+- stage: build
+  displayName: "Builds"
+  dependsOn:
+    - test 
+  jobs:
+  - template: scenarios/builds.yml
+    parameters:
+      artifactName: target

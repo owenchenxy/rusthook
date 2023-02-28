@@ -1,0 +1,66 @@
+parameters:
+  # azure pipelines paramters
+  - name: job_name
+    default: cargo_check
+  - name: job_displayName
+    default: Cargo check
+  - name: job_dependsOn
+    type: object
+    default: []
+  - name: job_condition
+    type: boolean
+    default: true
+  - name: job_continueOnError
+    type: boolean
+    default: false
+  - name: job_post-steps
+    type: object
+    default: []
+
+  # global parameters
+  - name: rust
+    default: stable
+
+  # parameters from `cargo check --help`
+  - name: all
+    type: boolean
+    default: false
+  - name: benches
+    type: boolean
+    default: false
+
+jobs:
+- job: ${{ parameters['job_name'] }}
+  displayName: ${{ parameters['job_displayName'] }}
+  condition: ${{ parameters['job_condition'] }}
+  dependsOn: ${{ parameters['job_dependsOn'] }}
+  continueOnError: ${{ parameters['job_continueOnError'] }}
+  pool:
+    vmImage: ubuntu-20.04
+  variables:
+    check_flags: ''
+  steps:
+  - template: ../steps/install-rust.yml
+    parameters:
+      rustup_toolchain: ${{ parameters['rust'] }}
+ 
+  # ##########################################################################################
+  # Order of script modifying `check_flags` is the same as in paramters.
+  - script: echo '##vso[task.setvariable variable=check_flags]$(check_flags) --all'
+    enabled: ${{ parameters['all'] }}
+    displayName: "[cli flag modify]Check all packages in the workspace"
+
+  - script: echo '##vso[task.setvariable variable=check_flags]$(check_flags) --benches'
+    enabled: ${{ parameters['benches'] }}
+    displayName: "[cli flag modify]check all benches"
+
+  # ##########################################################################################
+
+  # Final run
+  - script: cargo check $(check_flags)
+    displayName: Run Cargo check with defined flags 
+
+  # Custom steps:
+  - ${{ if parameters['job_post-steps'] }}:
+    - ${{ parameters['job_post-steps'] }}
+

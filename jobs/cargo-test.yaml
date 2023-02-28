@@ -1,0 +1,50 @@
+parameters:
+  job_name: cargo_test              
+  job_displayName: Cargo test       
+  job_dependsOn: []                 
+  job_condition: true               
+  job_continueOnError: false        
+  job_post-steps: []                
+  job_strategy:                     
+    matrix:
+      Linux:
+        vmImage: ubuntu-20.04
+      # MacOS:
+      #   vmImage: macOS-10.15
+      # Windows:
+      #   vmImage: windows-latest
+  # global parameters
+  rust: stable                
+
+  test_flags:
+    nocapture: false            
+jobs:
+- job: ${{ parameters['job_name'] }}
+  displayName: ${{ parameters['job_displayName'] }}
+  condition: ${{ parameters['job_condition'] }}
+  continueOnError: ${{ parameters['job_continueOnError'] }}
+  dependsOn: ${{ parameters['job_dependsOn'] }}
+  strategy: ${{ parameters['job_strategy'] }}
+  pool:
+    vmImage: $(vmImage)
+  variables:
+    check_flags: ''
+  steps:
+  - template: ../steps/install-rust.yml
+    parameters:
+      rustup_toolchain: ${{ parameters.rust }}
+
+  # *********************************************************************************************
+  # parameters from libtest `cargo test -- --help`
+  - script: echo '##vso[task.setvariable variable=check_flags]$(check_flags) --nocapture'
+    enabled: ${{ parameters.test_flags['nocapture'] }}
+    displayName: "[cli flag modify]don't capture stdout/stderr of each task, allow printing it directly"
+    
+  # *********************************************************************************************
+  - script: cargo test -- $(check_flags)
+    displayName: cargo test
+    
+  # Custom steps:
+  - ${{ if parameters['job_post-steps'] }}:
+    - ${{ parameters['job_post-steps'] }}
+
