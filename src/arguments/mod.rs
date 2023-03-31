@@ -73,6 +73,9 @@ impl Argument {
             ))
         }
         let payload = request.get("Body").unwrap();
+        if name == "" {
+            return Ok(payload.to_string());
+        }
         let v: Value = serde_json::from_str(payload).unwrap();
         match get_item_from_json(&v, name.as_str()){
             None => Ok(String::new()),
@@ -134,6 +137,14 @@ pub fn test_parse_arg(){
         ("Body".to_string(), "{\"data\":{\"data2\":[\"val1\", \"val2\"], \"data3\": \"val3\"},\"data_s\":\"s_d\"}".to_string()),
         ("Peer-Address".to_string(), "127.0.0.1:56020".to_string()),
     ]);
+
+    let map = HashMap::from([
+        ("source".to_string(), "payload".to_string()),
+        ("name".to_string(), "".to_string()),
+    ]);
+    let arg = Argument::new(&map).unwrap();
+    let res = arg.parse_from_request(&request).unwrap();
+    println!("{}, {}", res, res.len());
 
     let map = HashMap::from([
         ("source".to_string(), "request".to_string()),
