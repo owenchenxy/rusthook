@@ -74,9 +74,14 @@ impl Argument {
         }
         let payload = request.get("Body").unwrap();
         if name == "" {
+            let err_msg = format!("Pass entire payload as argument");
+            log::warn!("{}", err_msg);
             return Ok(payload.to_string());
         }
         let v: Value = serde_json::from_str(payload).unwrap();
+        
+        let err_msg = format!("Get argument [{}] from payload", name);
+        log::warn!("{}", err_msg);
         match get_item_from_json(&v, name.as_str()){
             None => Ok(String::new()),
             Some(s) => Ok(s)
