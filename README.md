@@ -60,7 +60,7 @@ global:
 
 Now, let's configure the real useful hooks. Imagine there is a cpu monitor in my system, it will send an http request to a webhook upon high CPU utilization detected. When the hook server receives the request, it knows that there's something wrong with the CPU utilization and should perform some actions to repair it. 
 
-For this senario, let's define a simple hook named `cpu_high_alert`(endpoint to receive alert request) that will run a script located in `/var/scripts/repair_cpu_high.sh`(to repair something according to the alert). Make sure that your bash script has `#!/bin/sh` shebang on top and is executable.
+For this senario, let's define a simple hook named `cpu_high_alert`(endpoint to receive alert request) that will run a script located in `/var/scripts/repair_cpu_high.sh`(to repair something according to the alert). Make sure that your bash script has `#!/bin/sh` shebang on top and is executable. To refer arguments from requests as command arguments to the script, please read [parameter reference page](docs/Referencing-Request-Values-As-Parameter.md) for details.
 
 Our hooks.yaml file will now look like this:
 ```
