@@ -40,11 +40,11 @@ Every single rule are defined by 4 keys:
     ``` 
     we can calculate it's sha1 hash with secret "mysecret", it should be `22b5b8548adfdec0322b2114f17648c34a3081e6`. Thus in the request headers, header "X-Signature" should contain a signature with this hash. e.g. 
     ```
-    X-Hub-Signature: sha1=22b5b8548adfdec0322b2114f17648c34a3081e6
+    X-Signature: sha1=22b5b8548adfdec0322b2114f17648c34a3081e6
     ```
     Note that if there are multiple signatures, they should be seperated by comma and will be tried one by one until a match is found. For example:
     ```
-    X-Hub-Signature: sha1=232328349ffdaccc78999897,sha1=22b5b8548adfdec0322b2114f17648c34a3081e6
+    X-Signature: sha1=232328349ffdaccc78999897,sha1=22b5b8548adfdec0322b2114f17648c34a3081e6
     ```
 + `hmac-sha256`: similar to `hmac-sha256`, payload will be encrypted by the give secret using SHA256 hash and compare with the specified source signature. The field `value` is for the secret key for encryption.
     ```
