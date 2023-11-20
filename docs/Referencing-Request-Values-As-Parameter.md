@@ -75,4 +75,3 @@ Then the value of key `user_infos.0.name` will refer string `prior` instead of `
   "source": "payload",
   "name": "entire-payload"
 ```
-Set as above to refer the entire payload as command parameter. 
