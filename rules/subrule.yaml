@@ -1,6 +1,0 @@
-and:
-- kind: value
-  value: GET
-  source: header
-  name: Method
-
