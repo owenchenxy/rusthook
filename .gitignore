@@ -12,5 +12,6 @@ Cargo.lock
 /src/command/log
 /log_dir
 /logs
+/rules
 /.vscode
 .DS_Store
