@@ -61,8 +61,9 @@ pub fn respond_with_favicon(stream: &mut TcpStream){
     let response = format!("HTTP/1.1 200 OK\r\n\
     Content-Length: {}\r\n\
     Content-Type:image/x-icon\r\n\
-    \r\n", FAVICON.len());  
-    stream.write(response.as_bytes()).unwrap();
+    \r\n", FAVICON.len()); 
+    Write::write_all(stream, response.as_bytes()).unwrap(); 
+    // stream.write(response.as_bytes()).unwrap();
     stream.write_all(FAVICON).unwrap();
     stream.flush().unwrap();
 }
