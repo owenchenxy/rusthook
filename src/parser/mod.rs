@@ -37,7 +37,7 @@ pub fn parse_http_body(reader: &mut BufReader<&mut TcpStream>, content_length: u
     let mut buf = [0u8; 2097152];
     let mut res = reader.take(2097152);
     let _= res.read(&mut buf);
-    let http_body = std::str::from_utf8(&mut buf[..content_length]).unwrap().to_string();
+    let http_body = std::str::from_utf8(&buf[..content_length]).unwrap().to_string();
     Some(http_body)
 }
 

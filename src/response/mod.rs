@@ -5,7 +5,7 @@ use crate::config::Config;
 use favicon::FAVICON;
 pub mod favicon;
 
-pub fn format_response_headers_to_string(headers: &Vec<HashMap<String, String>>) -> String{
+pub fn format_response_headers_to_string(headers: &[HashMap<String, String>]) -> String{
     headers.iter()
     .map(| item | {
         let name = item.get("name").unwrap().as_str();
@@ -35,15 +35,14 @@ pub fn http_response_with_child(stream: &mut TcpStream, child: &Child, http_requ
 }
 
 pub fn http_response_with_err(stream: &mut TcpStream, err: &io::Error, http_request: &HashMap<String, String>, config: Option<&Config>) {
-    let status_line: String;
-    match err.kind() {
+    let status_line = match err.kind() {
         io::ErrorKind::NotFound => {
-            status_line = format!("{} 404 Not Found", http_request.get("Version").unwrap());
+            format!("{} 404 Not Found", http_request.get("Version").unwrap())
         },
         _ => {
-            status_line = format!("{} 500 Internal Server Error", http_request.get("Version").unwrap());
+            format!("{} 500 Internal Server Error", http_request.get("Version").unwrap())
         }
-    }
+    };
     let err_msg = err.to_string();
     let contents = match config{
         None => &err_msg,

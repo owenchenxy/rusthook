@@ -17,7 +17,7 @@ impl OrRule {
             .unwrap()
             .iter()
             .map(Rule::new)
-            .filter(|r| {if let Rule::Invalid = r {false} else {true}})
+            .filter(|r| {!matches!(r, Rule::Invalid)})
             .collect(); 
 
         Rule::Or(OrRule{or})

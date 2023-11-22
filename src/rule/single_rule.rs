@@ -137,12 +137,11 @@ impl SingleRule {
             }
         };
 
-        let ip_ranges: Vec<String>;
-        if self.value.contains(','){
-            ip_ranges = extract_comma_separated_values(&self.value, "");
+        let ip_ranges: Vec<String> = if self.value.contains(','){
+            extract_comma_separated_values(&self.value, "")
         }else{
-            ip_ranges = vec![(*self.value).to_string()];
-        }
+            vec![(*self.value).to_string()]
+        };
 
         ip_ranges
         .iter()
