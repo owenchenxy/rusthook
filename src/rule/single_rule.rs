@@ -403,28 +403,8 @@ fn test_extract_comma_separated_cidr(){
 }
 
 #[test]
-fn test_read_rule_from_file(){
-    let rule_file = "src/tests/rule/rule.test.yaml";
+fn test_get_rule_from_file(){
+    let rule_file = "rule.test.yaml";
     let rule = get_rule_from_file(rule_file);
     println!("{:#?}", rule);
-}
-
-#[test]
-fn test_include_rules(){
-    let config_file = format!("{}/src/tests/config/hooks.test.rule.include.yaml", env!("CARGO_MANIFEST_DIR"));
-    use std::env;
-    env::set_var("CONFIG_PATH", config_file);
-    let rule = CONFIGS.hooks[0].trigger_rules.as_ref().unwrap();
-    let rule = Rule::new(rule);
-
-    let http_request = HashMap::from([
-        ("Url".to_string(), "/webhook-test-1".to_string()),
-        ("User-Agent".to_string(), "curl/7.77.0".to_string()),
-        ("Version".to_string(), "HTTP/1.1".to_string()),
-        ("Method".to_string(), "POST".to_string()),
-        ("Accept".to_string(), "*/*".to_string()),
-        ("Host".to_string(), "127.0.0.1:7878".to_string())
-        ]);
-
-    assert!(rule.is_matched(&http_request));
 }

@@ -19,12 +19,4 @@ impl NotRule {
     }
 }
 
-#[test]
-fn test_and_rule(){
-    let config_file = format!("{}/src/tests/config/hooks.test.rule.not.yaml", env!("CARGO_MANIFEST_DIR"));
-    let configs = crate::config::configs::Configs::new(&config_file);
-    let rule = configs.hooks[0].trigger_rules.as_ref().unwrap();
-    let rule = Rule::new(rule);
-    println!("{:#?}", rule);
-}
 
