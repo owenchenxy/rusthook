@@ -91,7 +91,7 @@ pub fn preflight_check(config: &Config, http_request: &HashMap<String, String>) 
 fn test_isnot_webhook_id_in_configs(){
     let config_file = format!("{}/src/tests/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
     use std::env;
-    env::set_var("CONFIG_PATH", &config_file);
+    env::set_var("CONFIG_PATH", config_file);
     let mut http_request: HashMap<String, String> = HashMap::new();
     http_request.insert("Url".to_string(), "/webhook-test-3/".to_string());
     let r = is_webhook_id_in_configs(&http_request);
@@ -102,7 +102,7 @@ fn test_isnot_webhook_id_in_configs(){
 fn test_is_webhook_id_in_configs(){
     let config_file = format!("{}/src/tests/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
     use std::env;
-    env::set_var("CONFIG_PATH", &config_file);
+    env::set_var("CONFIG_PATH", config_file);
     let mut http_request: HashMap<String, String> = HashMap::new();
     http_request.insert("Url".to_string(), "/webhook-test-1/?a=1&b=2".to_string());
     let r = is_webhook_id_in_configs(&http_request);

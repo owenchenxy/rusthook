@@ -69,7 +69,7 @@ fn test_parse_config_with_rule(){
     let config_file = format!("{}/src/tests/config/hooks.test.rule.yaml", env!("CARGO_MANIFEST_DIR"));
     use crate::config::configs::CONFIGS;
     use std::env;
-    env::set_var("CONFIG_PATH", &config_file);
+    env::set_var("CONFIG_PATH", config_file);
     let rule = CONFIGS.hooks[0].trigger_rules.as_ref().unwrap();
     let rule = Rule::new(rule);
     println!("{:#?}", rule);

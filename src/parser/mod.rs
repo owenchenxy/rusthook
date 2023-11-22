@@ -122,7 +122,7 @@ pub fn get_header_from_http_request(name: &str, http_request: &HashMap<String, S
 #[test]
 pub fn test_json_parse(){
     let item = "data.data2";
-    let mut indexes = item.split(".").into_iter();
+    let mut indexes = item.split('.');
     println!("{}", indexes.next().unwrap());
 }
 

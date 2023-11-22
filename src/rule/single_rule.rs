@@ -414,7 +414,7 @@ fn test_read_rule_from_file(){
 fn test_include_rules(){
     let config_file = format!("{}/src/tests/config/hooks.test.rule.include.yaml", env!("CARGO_MANIFEST_DIR"));
     use std::env;
-    env::set_var("CONFIG_PATH", &config_file);
+    env::set_var("CONFIG_PATH", config_file);
     let rule = CONFIGS.hooks[0].trigger_rules.as_ref().unwrap();
     let rule = Rule::new(rule);
 

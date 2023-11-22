@@ -91,6 +91,6 @@ fn test_get_config_by_http_request(){
 
 #[test]
 fn test_global_config(){
-    let config_file = format!("{}/src/tests/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
+    let _config_file = format!("{}/src/tests/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
 
 }

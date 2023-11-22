@@ -1,8 +1,8 @@
 use std::net::TcpListener;
 use std::env;
 extern crate lazy_static;
-use threadpool;
-use rusthook::{config::configs::{Configs, CONFIGS}, mylog::set_global_logger};
+
+use rusthook::{config::configs::{CONFIGS}, mylog::set_global_logger};
 
 use clap::Parser;
 
