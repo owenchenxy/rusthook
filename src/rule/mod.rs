@@ -1,7 +1,7 @@
-use std::{collections::HashMap, hash::Hash, io};
+use std::collections::HashMap;
 use serde::{Deserialize, Serialize};
 use serde_yaml::Value;
-use crate::config::configs;
+
 
 use and_rule::*;
 use not_rule::*;
@@ -66,7 +66,7 @@ impl Rule{
 }
 #[test]
 fn test_parse_config_with_rule(){
-    let config_file = format!("{}/src/config/hooks.test.rule.yaml", env!("CARGO_MANIFEST_DIR"));
+    let config_file = format!("{}/src/tests/config/hooks.test.rule.yaml", env!("CARGO_MANIFEST_DIR"));
     let configs = configs::Configs::new(&config_file);
     let rule = configs.hooks[0].trigger_rules.as_ref().unwrap();
     let rule = Rule::new(rule);

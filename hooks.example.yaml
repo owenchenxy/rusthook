@@ -17,6 +17,11 @@ global:
   ### uncomment the following line to customize
   # log_level: "Info"
 
+  ### directory of the trigger rules files
+  ### default is "rules" under current directory
+  ### uncomment the following line to customize
+  # trigger_rules_dir: "rules"
+
 hooks:
   ### specifies the ID of the hook. 
   ### rusthook server will create an endpoint using this ID. 

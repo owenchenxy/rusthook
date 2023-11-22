@@ -1,4 +1,4 @@
-pub const FAVICON: &'static [u8] = &[
+pub const FAVICON: &[u8] = &[
     0,
     0,
     1,

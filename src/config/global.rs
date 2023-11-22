@@ -12,15 +12,24 @@ pub struct GlobalConfig {
 
     #[serde(default = "GlobalConfig::default_log_level")]
     pub log_level: String,
+
+    #[serde(default = "GlobalConfig::default_rules_dir")]
+    pub rules_dir: String,
 }
 
+impl Default for GlobalConfig {
+     fn default() -> Self {
+         Self::new()
+     }
+ }
 
 impl GlobalConfig {
     pub fn new() -> Self{
         GlobalConfig { 
             log_dir: Self::default_log_dir(), 
             log_prefix: Self::default_log_prefix(), 
-            log_level: Self::default_log_level() 
+            log_level: Self::default_log_level(),
+            rules_dir: Self::default_rules_dir(),
         }
     }
 
@@ -36,12 +45,16 @@ impl GlobalConfig {
         String::from("Info")
     }
 
+    pub fn default_rules_dir() -> String{
+        String::from("rules")
+    }
+
     pub fn get_log_path(&self) -> String{
         let log_prefix = match &self.log_prefix{
-            Some(p) => &p,
+            Some(p) => p,
             None => "webhook",
         };
-        let log_dir = &self.log_dir.trim_end_matches("/").to_string();
+        let log_dir = &self.log_dir.trim_end_matches('/').to_string();
         let stdout_log_path = format!("{}/{}.log", log_dir.as_str(), log_prefix);
         stdout_log_path.to_string()
     }

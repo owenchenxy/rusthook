@@ -1,0 +1,7 @@
+and:
+  - kind: value
+    value: 127.0.0.1:7878
+    source: header
+    name: Host
+  - kind: include
+    value: "src/tests/rule/subrule.yaml"

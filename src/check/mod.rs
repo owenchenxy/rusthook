@@ -1,10 +1,10 @@
 use std::{collections::HashMap, fs, io};
-use crate::{Configs, config::Config, command::is_valid_command, parser::parse_hook_id_from_url};
+use crate::{config::{Config, configs::CONFIGS}, command::is_valid_command, parser::parse_hook_id_from_url};
 
-pub fn is_webhook_id_in_configs(configs: &Configs, http_request: &HashMap<String, String>) -> Result<(), io::Error>{
+pub fn is_webhook_id_in_configs(http_request: &HashMap<String, String>) -> Result<(), io::Error>{
     let url = http_request.get("Url").unwrap();
     let requested_id = parse_hook_id_from_url(url);
-    let required_ids:Vec<String> = configs.get_webhook_ids()
+    let required_ids:Vec<String> = CONFIGS.get_webhook_ids()
     .iter()
     .map(|id|id.trim_start_matches("/").to_string())
     .collect();
@@ -89,21 +89,23 @@ pub fn preflight_check(config: &Config, http_request: &HashMap<String, String>) 
 
 #[test]
 fn test_isnot_webhook_id_in_configs(){
-    let config_file = format!("{}/src/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
-    let configs = Configs::new(&config_file);
+    let config_file = format!("{}/src/tests/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
+    use std::env;
+    env::set_var("CONFIG_PATH", &config_file);
     let mut http_request: HashMap<String, String> = HashMap::new();
     http_request.insert("Url".to_string(), "/webhook-test-3/".to_string());
-    let r = is_webhook_id_in_configs(&configs, &http_request);
+    let r = is_webhook_id_in_configs(&http_request);
     assert!(r.is_err());
 }
 
 #[test]
 fn test_is_webhook_id_in_configs(){
-    let config_file = format!("{}/src/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
-    let configs = Configs::new(&config_file);
+    let config_file = format!("{}/src/tests/config/hooks.test.yaml", env!("CARGO_MANIFEST_DIR"));
+    use std::env;
+    env::set_var("CONFIG_PATH", &config_file);
     let mut http_request: HashMap<String, String> = HashMap::new();
     http_request.insert("Url".to_string(), "/webhook-test-1/?a=1&b=2".to_string());
-    let r = is_webhook_id_in_configs(&configs, &http_request);
+    let r = is_webhook_id_in_configs(&http_request);
     assert!(r.is_ok())
 }
 

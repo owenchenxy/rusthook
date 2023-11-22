@@ -17,6 +17,7 @@ regex = "^1.7.1"
 rust-crypto = "^0.2.36"
 itertools = "0.10.5"
 ipnet = "2.7.1"
+lazy_static = "1.4.0"
 
 [build]
 rustflags = ["-Clinker=rust-lld"]

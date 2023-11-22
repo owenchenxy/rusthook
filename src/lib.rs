@@ -1,5 +1,5 @@
 use std::{
-    io::{prelude::*, BufReader}, net::TcpStream, fs
+    io::{prelude::*, BufReader}, net::TcpStream
 };
 pub mod config;
 pub mod arguments;
@@ -9,7 +9,7 @@ pub mod parser;
 pub mod response;
 pub mod mylog;
 mod rule;
-use config::{configs::Configs};
+use config::configs::CONFIGS;
 use check::*;
 use command::*;
 use parser::{parse_http_header, parse_hook_id_from_url};
@@ -17,7 +17,7 @@ use response::{http_response_with_err, respond_with_favicon};
 
 use crate::parser::{parse_http_body, merge_http_request};
 
-pub fn handle_connection(mut stream: TcpStream, configs: Configs) -> Result<(), String>{   
+pub fn handle_connection(mut stream: TcpStream) -> Result<(), String>{   
     let mut reader = BufReader::new(&mut stream);
     // Get the http request header from tcpstream
     let http_header = parse_http_header(reader.by_ref());
@@ -39,13 +39,13 @@ pub fn handle_connection(mut stream: TcpStream, configs: Configs) -> Result<(), 
         return Ok(());
     }
     // check if the id in request defined in configs 
-    if let Err(e) = is_webhook_id_in_configs(&configs, &http_request) {
+    if let Err(e) = is_webhook_id_in_configs(&http_request) {
         http_response_with_err(&mut stream, &e, &http_request, None);
         return Ok(());
     };
 
     // get the right config
-    let config = &configs.get_config_by_http_request(&http_request);
+    let config = CONFIGS.get_config_by_http_request(&http_request);
 
     // preflight check according to the found config
     if let Err(e) = preflight_check(&config, &http_request){

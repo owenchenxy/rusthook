@@ -1,9 +1,8 @@
-use std::{
-    net::{TcpListener},
-};
-
+use std::net::TcpListener;
+use std::env;
+extern crate lazy_static;
 use threadpool;
-use rusthook::{config::configs::Configs, mylog::set_global_logger};
+use rusthook::{config::configs::{Configs, CONFIGS}, mylog::set_global_logger};
 
 use clap::Parser;
 
@@ -19,7 +18,7 @@ struct Args {
    port: String,
 
    /// config file path
-   #[arg(short, long, default_value_t = String::from("src/config/hooks.test.yaml"))]
+   #[arg(short, long, default_value_t = String::from("src/tests/config/hooks.test.yaml"))]
    config: String,
 
    /// max number of threads
@@ -39,18 +38,16 @@ fn main() {
     .num_threads(args.threads)
     .thread_name("conn".into())
     .thread_stack_size(args.stack_size).build();
-    
-    let configs = Configs::new(&args.config);
+    env::set_var("CONFIG_PATH", &args.config);
 
     //set a global logger
-    let global_logger_path = configs.global.get_log_path();
-    set_global_logger(&global_logger_path, configs.global.get_log_level().unwrap());
+    let global_logger_path = CONFIGS.global.get_log_path();
+    set_global_logger(&global_logger_path, CONFIGS.global.get_log_level().unwrap());
 
     for stream in listener.incoming() {
         let stream = stream.unwrap();
-        let cfg = configs.clone();
         pool.execute(||{
-            let _ = rusthook::handle_connection(stream, cfg);
+            let _ = rusthook::handle_connection(stream);
         });
     }
     

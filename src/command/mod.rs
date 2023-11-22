@@ -1,7 +1,7 @@
-use std::{process::{Command, Child, Stdio}, str, collections::HashMap, io::{self, Write}, net::TcpStream};
+use std::{process::{Command, Child, Stdio}, str, collections::HashMap, io::{self}, net::TcpStream};
 use log::{Record, Log};
 
-use crate::{config::{Config, configs::Configs}, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::{create_log_file, set_hook_logger}};
+use crate::{config::Config, response::{http_response_with_child, http_response_with_err}, arguments::Argument, mylog::{create_log_file, set_hook_logger}};
 
 pub fn execute_script(cmd: &str, cwd: &str, stdout_log: &str, arguments: &Vec<String>) -> io::Result<Child>{
     let stdout_file = create_log_file(stdout_log).unwrap();

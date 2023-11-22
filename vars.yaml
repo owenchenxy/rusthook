@@ -1,4 +1,0 @@
-variables:
-  azureSubscription: 'Personal'
-  storageaccount_name: 'storageaccount4me'
-  container_name: 'container4me'

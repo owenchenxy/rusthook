@@ -1,0 +1,22 @@
+---
+global:
+  #log_dir: "./log_dir/"
+  #log_prefix: "test-log"
+  # rules_dir: "./rules_dir/"
+
+hooks:
+- id: "webhook-test-1"
+  execute_command: "src/command/test.sh"
+  response_headers:
+    - name: "test_header_1"
+      value: "*"
+  #log_dir: "./log_dir/"
+  log_prefix: "test-log"
+  pass_arguments_to_command: 
+  - source: request
+    name: Method
+  trigger_rules:
+    kind: include
+    value: 'rule.test.yaml'
+
+  

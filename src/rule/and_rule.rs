@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use serde::{Serialize, Deserialize};
 use serde_yaml::Value;
+
+
 use super::Rule;
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
@@ -29,9 +31,10 @@ impl AndRule {
 
 #[test]
 fn test_and_rule(){
-    let config_file = format!("{}/src/config/hooks.test.rule.and.yaml", env!("CARGO_MANIFEST_DIR"));
-    let configs = crate::config::configs::Configs::new(&config_file);
-    let rule = configs.hooks[0].trigger_rules.as_ref().unwrap();
+    let config_file = format!("{}/src/tests/config/hooks.test.rule.and.yaml", env!("CARGO_MANIFEST_DIR"));
+    use std::env;
+    env::set_var("CONFIG_PATH", &config_file);
+    let rule = CONFIGS.hooks[0].trigger_rules.as_ref().unwrap();
     let rule = Rule::new(rule);
     println!("{:#?}", rule);
 }

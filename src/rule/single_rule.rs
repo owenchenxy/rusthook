@@ -1,12 +1,14 @@
-use std::{collections::HashMap, vec, net::{IpAddr, Ipv4Addr}};
+use std::{collections::HashMap, vec, net::{IpAddr, Ipv4Addr}, error::Error, fs};
 
 use ipnet::IpNet;
 use itertools::Itertools;
 use serde::{Serialize, Deserialize};
 use crypto::{sha1::Sha1, hmac::Hmac, mac::Mac, sha2::{Sha256, Sha512}};
 
-use crate::parser::*;
-use regex::{Regex};
+use crate::{parser::*, config::configs::CONFIGS};
+use regex::Regex;
+
+use super::Rule;
 
 
 #[derive(Debug, PartialEq, Serialize, Deserialize, Clone)]
@@ -38,6 +40,13 @@ impl SingleRule {
             "hmac-sha256" => self.match_hmac_sha256(http_request),
             "hmac-sha512" => self.match_hmac_sha512(http_request),
             "ip-whitelist" => self.match_ip_whitelist(http_request),
+            "include" => {
+                // read rule from the file specified by value
+                match get_rule_from_file(&self.value){
+                    Ok(r) => r.is_matched(http_request),
+                    Err(_) => return false,
+                }
+            },
             &_ => false,
         }
     }
@@ -151,6 +160,27 @@ impl SingleRule {
         .iter()
         .any(|x|x.contains(&ip))        
     }
+}
+
+fn get_rule_from_file(rule_file: &str) -> Result<Rule, Box<dyn Error>> {
+    let rule_str = match fs::read(format!("{}/{}", CONFIGS.global.rules_dir, &rule_file)) {
+        Ok(r) => r,
+        Err(e) => {
+            let msg = format!("Failed to read rule from file {}/{}: {}", CONFIGS.global.rules_dir, &rule_file, e);
+            log::error!("{}", msg);
+            return Err(Box::new(e));
+        }
+    };
+
+    let rule = match String::from_utf8(rule_str){
+        Ok(r) => Rule::new(&serde_yaml::from_str(r.as_str()).unwrap()),
+        Err(e) => {
+            let msg = format!("Failed to convert rule from file {}/{} to string: {}", CONFIGS.global.rules_dir, rule_file, e);
+            log::error!("{}", msg);
+            return Err(Box::new(e));
+        }
+    };
+    Ok(rule)
 }
 
 fn check_payload_signature(payload: Option<&String>, secret: &str, signature: &str)-> bool{
@@ -371,4 +401,31 @@ fn test_match_regex(){
 fn test_extract_comma_separated_cidr(){
     let s = "1.1.1.1/24,2.2.2.2/24";
     println!("{:#?}", extract_comma_separated_values(s, ""));
+}
+
+#[test]
+fn test_read_rule_from_file(){
+    let rule_file = "src/tests/rule/rule.test.yaml";
+    let rule = read_rule_from_file(rule_file);
+    println!("{:#?}", rule);
+}
+
+#[test]
+fn test_include_rules(){
+    let config_file = format!("{}/src/tests/config/hooks.test.rule.include.yaml", env!("CARGO_MANIFEST_DIR"));
+    use std::env;
+    env::set_var("CONFIG_PATH", &config_file);
+    let rule = CONFIGS.hooks[0].trigger_rules.as_ref().unwrap();
+    let rule = Rule::new(rule);
+
+    let http_request = HashMap::from([
+        ("Url".to_string(), "/webhook-test-1".to_string()),
+        ("User-Agent".to_string(), "curl/7.77.0".to_string()),
+        ("Version".to_string(), "HTTP/1.1".to_string()),
+        ("Method".to_string(), "POST".to_string()),
+        ("Accept".to_string(), "*/*".to_string()),
+        ("Host".to_string(), "127.0.0.1:7878".to_string())
+        ]);
+
+    assert!(rule.is_matched(&http_request));
 }
