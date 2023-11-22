@@ -82,7 +82,7 @@ and:
     source: payload
     name: user.id
 ```
-## Or
+### Or
 Or rule will evaluate to true, if any of the sub rules evaluate to true.
 ```
 or:
@@ -95,7 +95,7 @@ or:
     source: payload
     name: user.id
 ```
-## Not
+### Not
 Not rule will evaluate to true, if it's sub rule evaluate to false.
 ```
 not:
@@ -104,7 +104,7 @@ not:
   source: payload
   name: control.disabled
 ```
-## Multi-Level 
+### Multi-Level 
 Rules can be defined in multiple level
 ```
 and: 
@@ -126,4 +126,60 @@ and:
         value: "superuser: 0[0-9]*"
         source: payload
         name: user.id
+```
+
+## Include rules from file
+You can define a single rule or combined rule in a yaml file. This is helpful when you want to reuse these predefined rules or combined them flexibly in different hook definitions.
+
+### Use Case
+To include a rule from file, set the `kind` to `include` and the `value` to the file name you want to include a rule from. The rule file should be placed under the directory configured by `global.rules_dir`(`./rules` by default) in the configuration file, e.g.
+```
+kind: include
+value: "method_matcher.yaml"
+```
+
+The content of `method_matcher.yaml` might be a `Single rule` definition, which looks like below:
+```
+kind: value
+value: POST
+source: header
+name: Method
+```
+
+And it can also be a combined rule, which might look like this:
+```
+or: 
+  - kind: value
+    value: POST
+    source: header
+    name: Method
+  - kind: value
+    value: GET
+    source: header
+    name: Method  
+```
+
+Furthurmore, a rule file itself can include another rule file as well, for example, in `method_matcher.yaml`, it can look like this:
+```
+or:
+  - kind: include
+    value: "subrules/method_get.yaml"
+  - kind: include
+    value: "subrules/method_post.yaml"
+```
+
+The content of `subrules/method_get.yaml` should then look like:
+```
+kind: value
+value: GET
+source: header
+name: Method
+```
+
+The content of `subrules/method_post.yaml` should then look like:
+```
+kind: value
+value: POST
+source: header
+name: Method
 ```

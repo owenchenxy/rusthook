@@ -20,7 +20,7 @@ global:
   ### directory of the trigger rules files
   ### default is "rules" under current directory
   ### uncomment the following line to customize
-  # trigger_rules_dir: "rules"
+  # rules_dir: "rules"
 
 hooks:
   ### specifies the ID of the hook. 
