@@ -44,7 +44,7 @@ impl Argument {
             String::from("Version"), 
             String::from("Body"),
             ];
-        if invalid_headers.contains(&name){
+        if invalid_headers.contains(name){
             let err_msg = format!("Invalid Header Name [{}]", name);
             log::error!("{}", err_msg);
 
@@ -73,8 +73,8 @@ impl Argument {
             ))
         }
         let payload = request.get("Body").unwrap();
-        if name == "" {
-            let err_msg = format!("Pass entire payload as argument");
+        if name.is_empty() {
+            let err_msg = "Pass entire payload as argument".to_string();
             log::warn!("{}", err_msg);
             return Ok(payload.to_string());
         }

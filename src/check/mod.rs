@@ -6,7 +6,7 @@ pub fn is_webhook_id_in_configs(http_request: &HashMap<String, String>) -> Resul
     let requested_id = parse_hook_id_from_url(url);
     let required_ids:Vec<String> = CONFIGS.get_webhook_ids()
     .iter()
-    .map(|id|id.trim_start_matches("/").to_string())
+    .map(|id|id.trim_start_matches('/').to_string())
     .collect();
 
 
@@ -64,7 +64,7 @@ pub fn check_log_config(config: &Config) -> io::Result<()>{
 pub fn check_trigger_rules(config: &Config, http_request: &HashMap<String, String>) -> io::Result<()>{
     // check trigger rules
     if let Some(r) = config.get_trigger_rule(){
-        if !r.is_matched(&http_request){
+        if !r.is_matched(http_request){
             let err_msg = format!("Failed to Trigger Hook [{}]: Rule Mismatch!", config.id);
             log::error!("{}", err_msg);
 

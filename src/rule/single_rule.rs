@@ -44,7 +44,7 @@ impl SingleRule {
                 // read rule from the file specified by value
                 match get_rule_from_file(&self.value){
                     Ok(r) => r.is_matched(http_request),
-                    Err(_) => return false,
+                    Err(_) => false,
                 }
             },
             &_ => false,
@@ -69,18 +69,18 @@ impl SingleRule {
     fn match_regex(&self, http_request: &HashMap<String, String>) -> bool {
         match self.get_value_from_source(http_request) {
             Some(r) => {
-                let exp = format!(r"{}", self.value);
+                let exp = self.value.to_string();
                 let re = match Regex::new(&exp){
                     Ok(r) => r,
                     Err(e) => {
-                        let msg = format!("Invalid Regex {}, {}", exp, e.to_string());
+                        let msg = format!("Invalid Regex {}, {}", exp, e);
                         log::error!("{}", msg);
                         return false
                     }
                 };                
                 re.is_match(r.as_str())
             },
-            None => return false
+            None => false
         }  
     }
 
@@ -128,7 +128,7 @@ impl SingleRule {
 
     fn match_ip_whitelist(&self, http_request: &HashMap<String, String>) -> bool {
         let peer_address = http_request.get("Peer-Address").unwrap();
-        let ip = match peer_address.split(":").collect::<Vec<&str>>()[0].parse::<IpAddr>(){
+        let ip = match peer_address.split(':').collect::<Vec<&str>>()[0].parse::<IpAddr>(){
             Ok(r) => r,
             Err(e) => {
                 let msg = format!("Invalid Peer Address {}: {}", peer_address, e);
@@ -138,7 +138,7 @@ impl SingleRule {
         };
 
         let ip_ranges: Vec<String>;
-        if self.value.contains(","){
+        if self.value.contains(','){
             ip_ranges = extract_comma_separated_values(&self.value, "");
         }else{
             ip_ranges = vec![(*self.value).to_string()];
@@ -184,8 +184,8 @@ fn get_rule_from_file(rule_file: &str) -> Result<Rule, Box<dyn Error>> {
 }
 
 fn check_payload_signature(payload: Option<&String>, secret: &str, signature: &str)-> bool{
-    if secret == "" {
-        let err_msg = format!("signature validation secret can not be empty");
+    if secret.is_empty() {
+        let err_msg = "signature validation secret can not be empty".to_string();
         log::error!("{}", err_msg);
         return false;
 	}
@@ -196,8 +196,8 @@ fn check_payload_signature(payload: Option<&String>, secret: &str, signature: &s
 }
 
 fn check_payload_signature256(payload: Option<&String>, secret: &str, signature: &str)-> bool{
-    if secret == "" {
-        let err_msg = format!("signature validation secret can not be empty");
+    if secret.is_empty() {
+        let err_msg = "signature validation secret can not be empty".to_string();
         log::error!("{}", err_msg);
         return false;
 	}
@@ -208,8 +208,8 @@ fn check_payload_signature256(payload: Option<&String>, secret: &str, signature:
 }
 
 fn check_payload_signature512(payload: Option<&String>, secret: &str, signature: &str)-> bool{
-    if secret == "" {
-        let err_msg = format!("signature validation secret can not be empty");
+    if secret.is_empty() {
+        let err_msg = "signature validation secret can not be empty".to_string();
         log::error!("{}", err_msg);
         return false;
 	}
@@ -220,14 +220,14 @@ fn check_payload_signature512(payload: Option<&String>, secret: &str, signature:
 }
 
 fn extract_signatures(source: &str, prefix: &str) -> Vec<String> {
-    if source.contains(","){
+    if source.contains(','){
         return extract_comma_separated_values(source, prefix);
     }
     vec![source.trim_start_matches(prefix).to_string()]
 }
 
 fn extract_comma_separated_values(source: &str, prefix: &str) -> Vec<String>{
-    let values: Vec<String> = source.split(",")
+    let values: Vec<String> = source.split(',')
         .map(|s|s.trim())
         .filter(|s|s.starts_with(prefix))
         .map(|s|s.trim_start_matches(prefix).to_string())
@@ -237,8 +237,8 @@ fn extract_comma_separated_values(source: &str, prefix: &str) -> Vec<String>{
 
 fn validate_mac<T>(payload: Option<&String>, hasher: &mut T, signatures: Vec<String>) -> bool
 where T: Mac{
-    if let None = payload{
-        let msg = format!("HMAC validation failed due to empty payload !");
+    if payload.is_none(){
+        let msg = "HMAC validation failed due to empty payload !".to_string();
         log::warn!("{}", msg);
         return false;
     }
@@ -406,7 +406,7 @@ fn test_extract_comma_separated_cidr(){
 #[test]
 fn test_read_rule_from_file(){
     let rule_file = "src/tests/rule/rule.test.yaml";
-    let rule = read_rule_from_file(rule_file);
+    let rule = get_rule_from_file(rule_file);
     println!("{:#?}", rule);
 }
 

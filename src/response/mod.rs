@@ -10,7 +10,7 @@ pub fn format_response_headers_to_string(headers: &Vec<HashMap<String, String>>)
     .map(| item | {
         let name = item.get("name").unwrap().as_str();
         let value = item.get("value").unwrap().as_str();
-        vec![name, value].join(": ")
+        [name, value].join(": ")
     })
     .collect::<Vec<String>>()
     .join("\r\n")

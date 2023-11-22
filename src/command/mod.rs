@@ -70,7 +70,7 @@ pub fn trigger_hook(stream: &mut TcpStream, config: &Config, http_request: &Hash
             http_response_with_child(stream, &c, http_request, config)
         },
         Err(e) => {
-            let msg = format!("Failed to execute command {}: {}", &config.execute_command, e.to_string());
+            let msg = format!("Failed to execute command {}: {}", &config.execute_command, e);
             log::error!("{}", msg);
             http_response_with_err(stream, &e, http_request, Some(config))
         },

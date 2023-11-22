@@ -46,6 +46,12 @@ pub struct Config {
 }
 
 
+impl Default for Config {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Config {
     pub fn new() -> Self{
         Config{
@@ -64,10 +70,10 @@ impl Config {
     
     pub fn get_log_path(&self) -> String{
         let log_prefix = match &self.log_prefix{
-            Some(p) => &p,
+            Some(p) => p,
             None => &self.id,
         };
-        let log_dir = &self.log_dir.trim_end_matches("/").to_string();
+        let log_dir = &self.log_dir.trim_end_matches('/').to_string();
         let stdout_log_path = format!("{}/{}.log", log_dir.as_str(), log_prefix.as_str());
         stdout_log_path.to_string()
     }
@@ -127,10 +133,7 @@ impl Config {
     }
 
     pub fn get_trigger_rule(&self) -> Option<Rule>{
-        match &self.trigger_rules{
-            None => None,
-            Some(v) => Some(Rule::new(v))
-        }
+        self.trigger_rules.as_ref().map(Rule::new)
     }
 }
 

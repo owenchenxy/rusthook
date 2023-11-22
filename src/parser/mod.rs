@@ -56,12 +56,12 @@ pub fn merge_http_request(header: &HashMap<String, String>, body: &Option<String
 }
 
 pub fn parse_hook_id_from_url(url: &str) -> String{
-    let patterns: Vec<&str> = url.split("?").collect();
+    let patterns: Vec<&str> = url.split('?').collect();
     patterns[0].trim_matches('/').to_string()
 }
 
 pub fn parse_parameters_from_url(url: &str) -> HashMap<String, String>{
-    let patterns: Vec<&str> = url.split("?").collect();
+    let patterns: Vec<&str> = url.split('?').collect();
     let parameters = patterns[1..].join("?").to_string();
     let mut params_map = HashMap::new();
     let params_vec: Vec<&str> = parameters.split('&').collect();
@@ -77,7 +77,7 @@ pub fn parse_parameters_from_url(url: &str) -> HashMap<String, String>{
 pub fn get_item_from_json(v: &Value, item: &str) -> Option<String>{
     match &v[item] {
         Value::Null => {
-            let mut indexes = item.split(".").into_iter();
+            let mut indexes = item.split('.');
             let mut val = &v.clone();
             loop{
                 let next_index = indexes.next();

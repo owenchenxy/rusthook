@@ -16,7 +16,7 @@ impl OrRule {
             .as_sequence()
             .unwrap()
             .iter()
-            .map(|v|Rule::new(v))
+            .map(Rule::new)
             .filter(|r| {if let Rule::Invalid = r {false} else {true}})
             .collect(); 
 
