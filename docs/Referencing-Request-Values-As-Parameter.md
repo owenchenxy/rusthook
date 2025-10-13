@@ -71,9 +71,8 @@ if the payload looks like this:
 ```
 Then the value of key `user_infos.0.name` will refer string `prior` instead of `alex`. The server will preferentially consider a key as direct one rather than a nested one combined by the dot-notation.
 
-5. Refer the entire payload:
+5. Refer the entire payload, you can make the name empty:
 ```
-  "source": "payload",
-  "name": "entire-payload"
+  "source": "payload"
 ```
 Set as above to refer the entire payload as command parameter. 
